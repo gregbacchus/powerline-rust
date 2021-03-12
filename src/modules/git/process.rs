@@ -1,6 +1,7 @@
 use std::{path::Path, process::Command};
 
 use crate::{Error, R};
+use git2::Error;
 
 pub fn get_first_number(s: &str) -> u32 {
 	s.chars().take_while(|x| x.is_digit(10)).flat_map(|x| x.to_digit(10)).fold(0, |acc, x| 10 * acc + x)

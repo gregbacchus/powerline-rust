@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use super::Module;
-use crate::{terminal::Color, utils, Segment, R};
+use crate::{terminal::Color, utils, Segment};
 
 pub struct Host<S: HostScheme> {
 	show_on_local: bool,
@@ -24,7 +24,7 @@ impl<S: HostScheme> Host<S> {
 }
 
 impl<S: HostScheme> Module for Host<S> {
-	fn append_segments(&mut self, segments: &mut Vec<Segment>) -> R<()> {
+	fn append_segments(&mut self, segments: &mut Vec<Segment>) {
 		if self.show_on_local || utils::is_remote_shell() {
 			if let Ok(host) = hostname::get() {
 				segments.push(Segment::simple(
@@ -34,7 +34,5 @@ impl<S: HostScheme> Module for Host<S> {
 				));
 			}
 		}
-
-		Ok(())
 	}
 }

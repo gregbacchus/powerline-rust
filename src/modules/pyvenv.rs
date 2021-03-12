@@ -23,23 +23,19 @@ impl<S: PyVenvScheme> PyVenv<S> {
 }
 
 impl<S: PyVenvScheme> Module for PyVenv<S> {
-	fn append_segments(&mut self, segments: &mut Vec<Segment>) -> R<()> {
+	fn append_segments(&mut self, segments: &mut Vec<Segment>) {
 		let pyvenv = std::env::var("VIRTUAL_ENV")
 			.or_else(|_| std::env::var("CONDA_ENV_PATH"))
 			.or_else(|_| std::env::var("CONDA_DEFAULT_ENV"));
-		match pyvenv {
-			Ok(venv) => {
-				if let Some(venv_name) = Path::new(&venv).file_name() {
-					segments.push(Segment::simple(
-						format!(" {} {} ", S::PYVENV_SYMBOL, venv_name.to_string_lossy()),
-						S::PYVENV_FG,
-						S::PYVENV_BG,
-					));
-				}
-
-				Ok(())
+		pyvenv.and_then(|venv| {
+			if let Some(venv_name) = Path::new(&venv).file_name() {
+				segments.push(Segment::simple(
+					format!(" {} {} ", S::PYVENV_SYMBOL, venv_name.to_string_lossy()),
+					S::PYVENV_FG,
+					S::PYVENV_BG,
+				));
 			}
-			_ => Ok(()),
-		}
+			Ok(())
+		});
 	}
 }

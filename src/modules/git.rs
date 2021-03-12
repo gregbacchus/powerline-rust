@@ -8,6 +8,7 @@ use process as internal;
 use crate::{terminal::Color, Segment, R};
 
 use super::Module;
+use anyhow::Error;
 
 #[cfg(feature = "libgit")]
 mod libgit;
@@ -46,6 +47,8 @@ pub trait GitScheme {
 	const GIT_REPO_CLEAN_FG: Color;
 	const GIT_REPO_DIRTY_BG: Color;
 	const GIT_REPO_DIRTY_FG: Color;
+	const GIT_REPO_ERROR_BG: Color;
+	const GIT_REPO_ERROR_FG: Color;
 }
 
 impl<S: GitScheme> Git<S> {
@@ -82,34 +85,42 @@ fn find_git_dir() -> Option<path::PathBuf> {
 }
 
 impl<S: GitScheme> Module for Git<S> {
-	fn append_segments(&mut self, segments: &mut Vec<Segment>) -> R<()> {
+	fn append_segments(&mut self, segments: &mut Vec<Segment>) -> () {
 		let git_dir = match find_git_dir() {
 			Some(dir) => dir,
-			_ => return Ok(()),
+			_ => return (),
 		};
 
-		let stats = self.get_git_data(git_dir)?;
+		let stats = self.get_git_data(git_dir);
+		stats
+			.and_then(|git_stats| {
+				let (branch_fg, branch_bg) = if git_stats.is_dirty() {
+					(S::GIT_REPO_DIRTY_FG, S::GIT_REPO_DIRTY_BG)
+				} else {
+					(S::GIT_REPO_CLEAN_FG, S::GIT_REPO_CLEAN_BG)
+				};
 
-		let (branch_fg, branch_bg) = if stats.is_dirty() {
-			(S::GIT_REPO_DIRTY_FG, S::GIT_REPO_DIRTY_BG)
-		} else {
-			(S::GIT_REPO_CLEAN_FG, S::GIT_REPO_CLEAN_BG)
-		};
+				segments.push(Segment::simple(format!(" {} ", git_stats.branch_name), branch_fg, branch_bg));
 
-		segments.push(Segment::simple(format!(" {} ", stats.branch_name), branch_fg, branch_bg));
+				let mut add_elem = |count, symbol, fg, bg| match count {
+					1 => segments.push(Segment::simple(format!(" {} ", symbol), fg, bg)),
+					_ => segments.push(Segment::simple(format!(" {}{} ", count, symbol), fg, bg)),
+				};
 
-		let mut add_elem = |count, symbol, fg, bg| match count {
-			1 => segments.push(Segment::simple(format!(" {} ", symbol), fg, bg)),
-			_ => segments.push(Segment::simple(format!(" {}{} ", count, symbol), fg, bg)),
-		};
-
-		add_elem(stats.ahead, '\u{2B06}', S::GIT_AHEAD_FG, S::GIT_AHEAD_BG);
-		add_elem(stats.behind, '\u{2B07}', S::GIT_BEHIND_FG, S::GIT_BEHIND_BG);
-		add_elem(stats.staged, '\u{2714}', S::GIT_STAGED_FG, S::GIT_STAGED_BG);
-		add_elem(stats.non_staged, '\u{270E}', S::GIT_NOTSTAGED_FG, S::GIT_NOTSTAGED_BG);
-		add_elem(stats.untracked, '\u{2753}', S::GIT_UNTRACKED_FG, S::GIT_UNTRACKED_BG);
-		add_elem(stats.conflicted, '\u{273C}', S::GIT_CONFLICTED_FG, S::GIT_CONFLICTED_BG);
-
-		Ok(())
+				add_elem(git_stats.ahead, '\u{2B06}', S::GIT_AHEAD_FG, S::GIT_AHEAD_BG);
+				add_elem(git_stats.behind, '\u{2B07}', S::GIT_BEHIND_FG, S::GIT_BEHIND_BG);
+				add_elem(git_stats.staged, '\u{2714}', S::GIT_STAGED_FG, S::GIT_STAGED_BG);
+				add_elem(git_stats.non_staged, '\u{270E}', S::GIT_NOTSTAGED_FG, S::GIT_NOTSTAGED_BG);
+				add_elem(git_stats.untracked, '\u{2753}', S::GIT_UNTRACKED_FG, S::GIT_UNTRACKED_BG);
+				add_elem(git_stats.conflicted, '\u{273C}', S::GIT_CONFLICTED_FG, S::GIT_CONFLICTED_BG);
+				Ok(())
+			})
+			.map_err(|error| {
+				segments.push(Segment::simple(
+					format!("git error: {:?}", error),
+					S::GIT_REPO_ERROR_FG,
+					S::GIT_REPO_ERROR_BG,
+				))
+			});
 	}
 }

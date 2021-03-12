@@ -36,7 +36,7 @@ impl Powerline {
 		Powerline { segments: Vec::new() }
 	}
 
-	pub fn add_module(&mut self, mut part: impl Module) -> R<()> {
+	pub fn add_module(&mut self, mut part: impl Module) {
 		part.append_segments(&mut self.segments)
 	}
 }

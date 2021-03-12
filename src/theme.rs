@@ -66,6 +66,8 @@ impl GitScheme for SimpleTheme {
 	const GIT_REPO_CLEAN_FG: Color = Color(0);
 	const GIT_REPO_DIRTY_BG: Color = Color(161);
 	const GIT_REPO_DIRTY_FG: Color = Color(15);
+	const GIT_REPO_ERROR_BG: Color = Color(9);
+	const GIT_REPO_ERROR_FG: Color = Color(15);
 }
 
 impl PyVenvScheme for SimpleTheme {

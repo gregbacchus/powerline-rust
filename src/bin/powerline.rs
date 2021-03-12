@@ -4,7 +4,7 @@ use std::env;
 
 #[cfg(feature = "time")]
 use powerline::modules::Time;
-use powerline::{modules::*, theme::SimpleTheme, R};
+use powerline::{modules::*, theme::SimpleTheme};
 
 const GIT_ENABLED_FLAG: &str = "git";
 const GIT_DISABLED_FLAG: &str = "-git";
@@ -78,39 +78,38 @@ fn main() -> powerline::R<()> {
 	#[cfg(feature = "time")]
 	{
 		if time_enabled {
-			measure_elapsed("time", || prompt.add_module(Time::<SimpleTheme>::with_time_format("%H:%M:%S")))?;
+			measure_elapsed("time", || prompt.add_module(Time::<SimpleTheme>::with_time_format("%H:%M:%S")));
 		}
 	}
 	if pyvenv_enabled {
-		measure_elapsed("pyvenv", || prompt.add_module(PyVenv::<SimpleTheme>::new()))?;
+		measure_elapsed("pyvenv", || prompt.add_module(PyVenv::<SimpleTheme>::new()));
 	}
 	if user_enabled {
-		measure_elapsed("user", || prompt.add_module(User::<SimpleTheme>::new()))?;
+		measure_elapsed("user", || prompt.add_module(User::<SimpleTheme>::new()));
 	}
 	if host_enabled {
-		measure_elapsed("host", || prompt.add_module(Host::<SimpleTheme>::new()))?;
+		measure_elapsed("host", || prompt.add_module(Host::<SimpleTheme>::new()));
 	}
 	if cwd_enabled {
-		measure_elapsed("cwd", || prompt.add_module(Cwd::<SimpleTheme>::new(45, 4, false)))?;
+		measure_elapsed("cwd", || prompt.add_module(Cwd::<SimpleTheme>::new(45, 4, false)));
 	}
 	if git_enabled {
-		measure_elapsed("git", || prompt.add_module(Git::<SimpleTheme>::new()))?;
+		measure_elapsed("git", || prompt.add_module(Git::<SimpleTheme>::new()));
 	}
 	if readonly_enabled {
-		measure_elapsed("readonly", || prompt.add_module(ReadOnly::<SimpleTheme>::new()))?;
+		measure_elapsed("readonly", || prompt.add_module(ReadOnly::<SimpleTheme>::new()));
 	}
 	if cmd_enabled {
-		measure_elapsed("cmd", || prompt.add_module(Cmd::<SimpleTheme>::new()))?;
+		measure_elapsed("cmd", || prompt.add_module(Cmd::<SimpleTheme>::new()));
 	}
 	if exitcode_enabled {
-		measure_elapsed("exitcode", || prompt.add_module(ExitCode::<SimpleTheme>::new()))?;
+		measure_elapsed("exitcode", || prompt.add_module(ExitCode::<SimpleTheme>::new()));
 	}
-
 	println!("{}", prompt);
 	Ok(())
 }
 
-fn measure_elapsed(label: &str, mut expr: impl FnMut() -> R<()>) -> R<()> {
+fn measure_elapsed(label: &str, mut expr: impl FnMut() -> ()) {
 	let _ = label;
 	#[cfg(feature = "print-module-timings")]
 	let start = std::time::Instant::now();

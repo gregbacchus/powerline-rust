@@ -24,14 +24,12 @@ impl<S: TimeScheme> Time<S> {
 }
 
 impl<S: TimeScheme> Module for Time<S> {
-	fn append_segments(&mut self, segments: &mut Vec<Segment>) -> R<()> {
+	fn append_segments(&mut self, segments: &mut Vec<Segment>) {
 		let (fg, bg) = (S::TIME_FG, S::TIME_BG);
 
 		let now = chrono::offset::Local::now();
 		let value = now.format(self.time_format).to_string();
 
 		segments.push(Segment::simple(format!(" {} ", value), fg, bg));
-
-		Ok(())
 	}
 }

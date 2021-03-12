@@ -25,17 +25,18 @@ pub use user::{User, UserScheme};
 pub use time::{Time, TimeScheme};
 
 pub trait Module: Sized {
-	fn append_segments(&mut self, segments: &mut Vec<Segment>) -> R<()>;
+	fn append_segments(&mut self, segments: &mut Vec<Segment>) -> ();
 
 	#[inline]
-	fn into_segments(mut self) -> R<Vec<Segment>> {
+	fn into_segments(mut self) -> Vec<Segment> {
 		self.get_segments()
 	}
 
 	#[inline]
-	fn get_segments(&mut self) -> R<Vec<Segment>> {
+	fn get_segments(&mut self) -> Vec<Segment> {
 		let mut vec = Vec::new();
 
-		self.append_segments(&mut vec).map(|_| vec)
+		self.append_segments(&mut vec);
+		vec
 	}
 }

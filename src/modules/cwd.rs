@@ -1,6 +1,7 @@
 use super::Module;
 use crate::{terminal::Color, Segment, R};
 use dirs::home_dir;
+use std::error::Error;
 use std::{env, marker::PhantomData, path};
 
 pub struct Cwd<S: CwdScheme> {
@@ -36,14 +37,17 @@ macro_rules! append_cwd_segments {
 				'\u{E0B1}',
 				S::SEPARATOR_FG,
 			));
-			}
+		}
 	};
 }
 
 impl<S: CwdScheme> Module for Cwd<S> {
-	fn append_segments(&mut self, segments: &mut Vec<Segment>) -> R<()> {
-		let current_dir =
-			if self.resolve_symlinks { env::current_dir()? } else { path::PathBuf::from(env::var("PWD")?) };
+	fn append_segments(&mut self, segments: &mut Vec<Segment>) {
+		let current_dir = if self.resolve_symlinks {
+			env::current_dir().unwrap_or("".into())
+		} else {
+			path::PathBuf::from(env::var("PWD").unwrap_or("".into()))
+		};
 
 		let mut cwd = current_dir.to_str().unwrap();
 
@@ -87,7 +91,5 @@ impl<S: CwdScheme> Module for Cwd<S> {
 			last.sep = '\u{E0B0}';
 			last.sep_col = last.bg.transpose();
 		}
-
-		Ok(())
 	}
 }
