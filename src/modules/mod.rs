@@ -1,4 +1,4 @@
-use crate::{powerline::Segment, R};
+use crate::powerline::Segment;
 
 mod cmd;
 mod cwd;
@@ -25,7 +25,7 @@ pub use user::{User, UserScheme};
 pub use time::{Time, TimeScheme};
 
 pub trait Module: Sized {
-	fn append_segments(&mut self, segments: &mut Vec<Segment>) -> ();
+	fn append_segments(&mut self, segments: &mut Vec<Segment>);
 
 	#[inline]
 	fn into_segments(mut self) -> Vec<Segment> {

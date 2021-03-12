@@ -8,7 +8,6 @@ use process as internal;
 use crate::{terminal::Color, Segment, R};
 
 use super::Module;
-use anyhow::Error;
 
 #[cfg(feature = "libgit")]
 mod libgit;
@@ -85,15 +84,15 @@ fn find_git_dir() -> Option<path::PathBuf> {
 }
 
 impl<S: GitScheme> Module for Git<S> {
-	fn append_segments(&mut self, segments: &mut Vec<Segment>) -> () {
+	fn append_segments(&mut self, segments: &mut Vec<Segment>) {
 		let git_dir = match find_git_dir() {
 			Some(dir) => dir,
-			_ => return (),
+			_ => return,
 		};
 
 		let stats = self.get_git_data(git_dir);
 		stats
-			.and_then(|git_stats| {
+			.map(|git_stats| {
 				let (branch_fg, branch_bg) = if git_stats.is_dirty() {
 					(S::GIT_REPO_DIRTY_FG, S::GIT_REPO_DIRTY_BG)
 				} else {
@@ -113,7 +112,6 @@ impl<S: GitScheme> Module for Git<S> {
 				add_elem(git_stats.non_staged, '\u{270E}', S::GIT_NOTSTAGED_FG, S::GIT_NOTSTAGED_BG);
 				add_elem(git_stats.untracked, '\u{2753}', S::GIT_UNTRACKED_FG, S::GIT_UNTRACKED_BG);
 				add_elem(git_stats.conflicted, '\u{273C}', S::GIT_CONFLICTED_FG, S::GIT_CONFLICTED_BG);
-				Ok(())
 			})
 			.map_err(|error| {
 				segments.push(Segment::simple(
@@ -121,6 +119,7 @@ impl<S: GitScheme> Module for Git<S> {
 					S::GIT_REPO_ERROR_FG,
 					S::GIT_REPO_ERROR_BG,
 				))
-			});
+			})
+			.unwrap_or_default();
 	}
 }

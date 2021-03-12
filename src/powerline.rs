@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::{modules::Module, terminal::*, R};
+use crate::{modules::Module, terminal::*};
 
 #[derive(Clone)]
 pub struct Segment {

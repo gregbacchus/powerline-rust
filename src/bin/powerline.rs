@@ -28,7 +28,7 @@ const TIME_ENABLED_FLAG: &str = "time";
 #[cfg(feature = "time")]
 const TIME_DISABLED_FLAG: &str = "-time";
 
-fn main() -> powerline::R<()> {
+fn main() {
 	let mut prompt = powerline::Powerline::new();
 
 	let mut pyvenv_enabled = true;
@@ -106,10 +106,9 @@ fn main() -> powerline::R<()> {
 		measure_elapsed("exitcode", || prompt.add_module(ExitCode::<SimpleTheme>::new()));
 	}
 	println!("{}", prompt);
-	Ok(())
 }
 
-fn measure_elapsed(label: &str, mut expr: impl FnMut() -> ()) {
+fn measure_elapsed(label: &str, mut expr: impl FnMut()) {
 	let _ = label;
 	#[cfg(feature = "print-module-timings")]
 	let start = std::time::Instant::now();

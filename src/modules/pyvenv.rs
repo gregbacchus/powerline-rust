@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 use std::path::Path;
 
 use crate::terminal::Color;
-use crate::{Segment, R};
+use crate::Segment;
 
 use super::Module;
 
@@ -27,15 +27,16 @@ impl<S: PyVenvScheme> Module for PyVenv<S> {
 		let pyvenv = std::env::var("VIRTUAL_ENV")
 			.or_else(|_| std::env::var("CONDA_ENV_PATH"))
 			.or_else(|_| std::env::var("CONDA_DEFAULT_ENV"));
-		pyvenv.and_then(|venv| {
-			if let Some(venv_name) = Path::new(&venv).file_name() {
-				segments.push(Segment::simple(
-					format!(" {} {} ", S::PYVENV_SYMBOL, venv_name.to_string_lossy()),
-					S::PYVENV_FG,
-					S::PYVENV_BG,
-				));
-			}
-			Ok(())
-		});
+		pyvenv
+			.map(|venv| {
+				if let Some(venv_name) = Path::new(&venv).file_name() {
+					segments.push(Segment::simple(
+						format!(" {} {} ", S::PYVENV_SYMBOL, venv_name.to_string_lossy()),
+						S::PYVENV_FG,
+						S::PYVENV_BG,
+					));
+				}
+			})
+			.unwrap_or_default();
 	}
 }

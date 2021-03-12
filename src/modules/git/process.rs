@@ -1,6 +1,6 @@
 use std::{path::Path, process::Command};
 
-use crate::{Error, R};
+use crate::Error;
 use git2::Error;
 
 pub fn get_first_number(s: &str) -> u32 {

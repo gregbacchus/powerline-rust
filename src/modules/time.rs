@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use super::Module;
-use crate::{powerline::Segment, terminal::Color, R};
+use crate::{powerline::Segment, terminal::Color};
 
 pub struct Time<S: TimeScheme> {
 	time_format: &'static str,

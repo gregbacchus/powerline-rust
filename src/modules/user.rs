@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use super::Module;
-use crate::{terminal::Color, utils, Segment, R};
+use crate::{terminal::Color, utils, Segment};
 
 pub struct User<S: UserScheme> {
 	show_on_local: bool,

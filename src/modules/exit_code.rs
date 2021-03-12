@@ -1,7 +1,7 @@
 use std::{env, marker::PhantomData};
 
 use super::Module;
-use crate::{powerline::Segment, terminal::Color, R};
+use crate::{powerline::Segment, terminal::Color};
 
 pub struct ExitCode<S: ExitCodeScheme> {
 	scheme: PhantomData<S>,
