@@ -37,7 +37,7 @@ mod test {
 	#[test]
 	fn exit_code_returns_single_segment() {
 		let mut exit_code = ExitCode::<SimpleTheme>::new();
-		let segments = exit_code.get_segments().unwrap();
+		let segments = exit_code.get_segments();
 
 		assert_eq!(1, segments.len())
 	}
