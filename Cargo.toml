@@ -11,7 +11,7 @@ libc = "0.2"
 hostname = "0.3"
 git2 = { version = "0.13", optional = true, default-features = false }
 chrono = { version = "0.4.19", optional = true }
-dirs = "3.0.1"
+dirs = "3.0.2"
 
 [dev-dependencies]
 criterion = "0.3"
