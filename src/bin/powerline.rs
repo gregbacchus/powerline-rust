@@ -33,7 +33,7 @@ fn main() {
 
 	let mut pyvenv_enabled = true;
 	let mut user_enabled = true;
-	let mut host_enabled = true;
+	let mut host_enabled = false;
 	let mut cwd_enabled = true;
 	let mut git_enabled = true;
 	let mut readonly_enabled = true;
