@@ -63,7 +63,17 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Build
+      - name: Build bare version
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          use-cross: true
+          args: --release --target=${{ matrix.target }} --no-default-features --features=bare-shell,libgit,cli-options,time
+      - name: rename bare binary
+        run: mv target/$TARGET/release/powerline target/$TARGET/release/powerline-bare
+        env:
+          TARGET: ${{ matrix.target }}
+      - name: Build bash version
         uses: actions-rs/cargo@v1
         with:
           command: build
@@ -73,7 +83,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: target
-          path: target/**/release/powerline
+          path: target/**/release/powerline*
   package:
     name: Build deb packages
     if: github.event_name != 'pull_request'
@@ -96,8 +106,8 @@ jobs:
           export DEB_VERSION="$(cat Cargo.toml | grep "^version = " | awk  '{gsub(/"/, "", $3); print $3}')-$(printf "%04d" $GITHUB_RUN_NUMBER)"
           echo $DEB_VERSION
           find -name powerline -exec chmod +x {} \;
-          fpm -f -s dir -t deb --deb-priority optional --maintainer github@growse.com --vendor github@growse.com --license MIT -n $DEB_NAME --description "$APPDESCRIPTION" --url $APPURL --prefix / -a amd64 -v $DEB_VERSION ./x86_64-unknown-linux-musl/release/powerline=/usr/bin/powerline-rust
-          fpm -f -s dir -t deb --deb-priority optional --maintainer github@growse.com --vendor github@growse.com --license MIT -n $DEB_NAME --description "$APPDESCRIPTION" --url $APPURL --prefix / -a armhf -v $DEB_VERSION ./arm-unknown-linux-musleabihf/release/powerline=/usr/bin/powerline-rust
+          fpm -f -s dir -t deb --deb-priority optional --maintainer github@growse.com --vendor github@growse.com --license MIT -n $DEB_NAME --description "$APPDESCRIPTION" --url $APPURL --prefix / -a amd64 -v $DEB_VERSION ./x86_64-unknown-linux-musl/release/powerline=/usr/bin/powerline-rust ./x86_64-unknown-linux-musl/release/powerline-bare=/usr/bin/powerline-rust-bare
+          fpm -f -s dir -t deb --deb-priority optional --maintainer github@growse.com --vendor github@growse.com --license MIT -n $DEB_NAME --description "$APPDESCRIPTION" --url $APPURL --prefix / -a armhf -v $DEB_VERSION ./arm-unknown-linux-musleabihf/release/powerline=/usr/bin/powerline-rust ./arm-unknown-linux-musleabihf/release/powerline-bare=/usr/bin/powerline-rust-bare
         env:
           DEB_NAME: powerline-rust
           APPDESCRIPTION: powerline-shell written in Rust
