@@ -2,7 +2,7 @@
 name = "powerline"
 version = "0.2.2"
 authors = ["growse <github@growse.com>", "cirho <me@cirho.com>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 anyhow = "1.0.45"
