@@ -23,8 +23,8 @@ pub struct GitStats {
 	pub untracked: u32,
 	pub conflicted: u32,
 	pub non_staged: u32,
-	pub ahead: u32,
-	pub behind: u32,
+	pub ahead: Option<u32>,
+	pub behind: Option<u32>,
 	pub staged: u32,
 	pub branch_name: String,
 }
@@ -106,8 +106,13 @@ impl<S: GitScheme> Module for Git<S> {
 					_ => segments.push(Segment::simple(format!(" {}{} ", count, symbol), fg, bg)),
 				};
 
-				add_elem(git_stats.ahead, '\u{2B06}', S::GIT_AHEAD_FG, S::GIT_AHEAD_BG);
-				add_elem(git_stats.behind, '\u{2B07}', S::GIT_BEHIND_FG, S::GIT_BEHIND_BG);
+				if let Some(ahead) = git_stats.ahead {
+					add_elem(ahead, '\u{2B06}', S::GIT_AHEAD_FG, S::GIT_AHEAD_BG)
+				}
+				if let Some(behind) = git_stats.behind {
+					add_elem(behind, '\u{2B07}', S::GIT_BEHIND_FG, S::GIT_BEHIND_BG);
+				}
+
 				add_elem(git_stats.staged, '\u{2714}', S::GIT_STAGED_FG, S::GIT_STAGED_BG);
 				add_elem(git_stats.non_staged, '\u{270E}', S::GIT_NOTSTAGED_FG, S::GIT_NOTSTAGED_BG);
 				add_elem(git_stats.untracked, '?', S::GIT_UNTRACKED_FG, S::GIT_UNTRACKED_BG);

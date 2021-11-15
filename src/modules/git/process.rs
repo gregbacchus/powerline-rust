@@ -1,110 +1,135 @@
-use std::{path::Path, process::Command};
+use std::path::Path;
 
-use crate::Error;
-use git2::Error;
+use crate::{modules::git::GitStats, R};
 
-pub fn get_first_number(s: &str) -> u32 {
-	s.chars().take_while(|x| x.is_digit(10)).flat_map(|x| x.to_digit(10)).fold(0, |acc, x| 10 * acc + x)
+pub fn run_git(path: &Path) -> R<super::GitStats> {
+    let (mut untracked, mut non_staged, mut conflicted, mut staged, mut ahead, mut behind) =
+        (0, 0, 0, 0, None, None);
+
+    let git_status = std::process::Command::new("git")
+        .current_dir(path)
+        .arg("status")
+        .arg("--porcelain=v2")
+        .arg("--branch")
+        .arg("-z")
+        .output()?;
+    let output = String::from_utf8_lossy(&git_status.stdout).to_string();
+    let output_split_by_line = output.split("\0").collect::<Vec<&str>>();
+    let mut branch_name: String = "".to_string();
+    for header_line in output_split_by_line.iter().filter(|line| line.starts_with("# ")) {
+        let mut splits = header_line.splitn(3, " ");
+        match splits.nth(1) {
+            Some("branch.head") => {
+                branch_name = splits.last().unwrap_or("").to_string();
+            }
+            Some("branch.ab") => {
+                let header_value = splits.last().unwrap();
+                let values = header_value.splitn(2, " ").collect::<Vec<&str>>();
+                if values.len() == 2 {
+                    ahead = *&values[0][1..].parse::<u32>().ok();
+                    behind = *&values[1][1..].parse::<u32>().ok();
+                }
+            }
+            _ => {}
+        }
+    }
+
+    for line in output_split_by_line.iter().filter(|line| !line.starts_with("# ")) {
+        if line.is_empty() {
+            continue;
+        }
+        let chars = format!("{:width$}", line, width = 4).chars().collect::<Vec<char>>();
+        let status_part_of_line: [char; 4] = chars[0..4].try_into().unwrap_or_default();
+
+        let status = GitStatusLine::new(status_part_of_line);
+
+        match status.tracking {
+            GitStatusTracking::Unmerged => match (status.index_status, status.working_tree_status) {
+                (GitStatus::Deleted, GitStatus::Deleted | GitStatus::UpdatedButUnmerged)
+                | (GitStatus::Added, GitStatus::UpdatedButUnmerged | GitStatus::Added)
+                | (
+                    GitStatus::UpdatedButUnmerged,
+                    GitStatus::Deleted | GitStatus::Added | GitStatus::UpdatedButUnmerged,
+                ) => conflicted += 1,
+                _ => {}
+            },
+            GitStatusTracking::Renamed | GitStatusTracking::Ordinary => {
+                if status.working_tree_status != GitStatus::Unmodified {
+                    non_staged += 1
+                }
+                if status.index_status != GitStatus::Unmodified {
+                    staged += 1
+                }
+            }
+            GitStatusTracking::Untracked => untracked += 1,
+            _ => {}
+        }
+    }
+
+    Ok(GitStats { untracked, staged, non_staged, ahead, behind, conflicted, branch_name })
 }
 
-pub fn extract_ahead_behind(s: &str) -> (u32, u32) {
-	let extract_number = |pos: usize, offset: usize| -> u32 {
-		let s = s.get((pos + offset)..).unwrap();
-		get_first_number(s)
-	};
-	let ahead = s.find("ahead").map(|pos| extract_number(pos, 6)).unwrap_or(0);
-	let behind = s.find("behind").map(|pos| extract_number(pos, 7)).unwrap_or(0);
-	(ahead, behind)
+#[derive(Debug)]
+struct GitStatusLine {
+    tracking: GitStatusTracking,
+    index_status: GitStatus,
+    working_tree_status: GitStatus,
 }
 
-pub fn get_branch_name(s: &str) -> Option<&str> {
-	if let Some(rest) = s.get(3..) {
-		let mut end: usize = 0;
-		if let Some(pos) = rest.find("...") {
-			end = pos
-		} else {
-			let mut text = rest.chars();
-			while let Some(c) = text.next() {
-				end += 1;
-				if c.is_whitespace() {
-					if Some('[') != text.next() {
-						return None;
-					}
-					break;
-				}
-			}
-		}
-		rest.get(..end)
-	} else {
-		None
-	}
+impl GitStatusLine {
+    fn new(line: [char; 4]) -> GitStatusLine {
+        GitStatusLine {
+            tracking: GitStatusTracking::parse(line[0]),
+            index_status: GitStatus::parse(line[2]),
+            working_tree_status: GitStatus::parse(line[3]),
+        }
+    }
 }
 
-pub fn get_detached_branch_name() -> R<String> {
-	let child = Command::new("git")
-		.args(&["describe", "--tags", "--always"])
-		.output()
-		.map_err(|e| Error::wrap(e, "Failed to run git"))?;
-	Ok(if child.status.success() {
-		let branch = std::str::from_utf8(&child.stdout)?
-			.split('\n')
-			.next()
-			.ok_or_else(|| Error::from_str("Empty git output"))?;
-		format!("\u{2693}{}", branch)
-	} else {
-		String::from("Big Bang")
-	})
+#[derive(Debug, PartialEq)]
+enum GitStatus {
+    Unmodified,
+    Modified,
+    Added,
+    Deleted,
+    Renamed,
+    Copied,
+    UpdatedButUnmerged,
 }
 
-pub fn run_git(_: &Path) -> R<super::GitStats> {
-	let output = Command::new("git")
-		.args(&["status", "--porcelain", "-b"])
-		.output()
-		.map_err(|e| Error::wrap(e, "Failed to run git"))?
-		.stdout;
+impl GitStatus {
+    fn parse(c: char) -> GitStatus {
+        match c {
+            '.' => GitStatus::Unmodified,
+            'M' => GitStatus::Modified,
+            'A' => GitStatus::Added,
+            'D' => GitStatus::Deleted,
+            'R' => GitStatus::Renamed,
+            'C' => GitStatus::Copied,
+            'U' => GitStatus::UpdatedButUnmerged,
+            _ => GitStatus::Unmodified,
+        }
+    }
+}
 
-	let mut lines = output.split(|x| *x == (b'\n'));
-	let branch_line = std::str::from_utf8(lines.next().ok_or_else(|| Error::from_str("Empty git output"))?)?;
+#[derive(Debug)]
+enum GitStatusTracking {
+    Ordinary,
+    Renamed,
+    Unmerged,
+    Untracked,
+    Ignored,
+}
 
-	let mut ahead = 0;
-	let mut behind = 0;
-	let mut non_staged = 0;
-	let mut staged = 0;
-	let mut conflicted = 0;
-	let mut untracked = 0;
-
-	let branch_name = {
-		if let Some(branch_name) = get_branch_name(&branch_line) {
-			if let Some(info) = branch_line.find('[').map(|pos| branch_line.get(pos..).unwrap()) {
-				let (a, b) = extract_ahead_behind(info);
-				ahead = a;
-				behind = b;
-			}
-			String::from(branch_name)
-		} else {
-			get_detached_branch_name()?
-		}
-	};
-	let mut add_file = |entry: &str| {
-		match entry {
-			"??" => untracked += 1,
-			"DD" | "AU" | "UD" | "UA" | "UU" | "DU" | "AA" => conflicted += 1,
-			_ => {
-				let mut chars = entry.chars();
-				let a = chars.next().expect("invalid file status");
-				let b = chars.next().expect("invalid file status");
-				if b != ' ' {
-					non_staged += 1;
-				}
-				if a != ' ' {
-					staged += 1;
-				}
-			}
-		};
-	};
-	for op in lines.flat_map(|line| line.get(..2)) {
-		add_file(std::str::from_utf8(op)?);
-	}
-
-	Ok(super::GitStats { untracked, ahead, behind, non_staged, staged, conflicted, branch_name })
+impl GitStatusTracking {
+    fn parse(c: char) -> GitStatusTracking {
+        match c {
+            '1' => GitStatusTracking::Ordinary,
+            '2' => GitStatusTracking::Renamed,
+            'u' => GitStatusTracking::Unmerged,
+            '?' => GitStatusTracking::Untracked,
+            '!' => GitStatusTracking::Ignored,
+            _ => GitStatusTracking::Untracked,
+        }
+    }
 }
