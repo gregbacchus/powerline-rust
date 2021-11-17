@@ -77,8 +77,8 @@ pub fn run_git(path: &Path) -> R<super::GitStats> {
 		untracked,
 		staged,
 		non_staged,
-		ahead: ahead as u32,
-		behind: behind as u32,
+		ahead: Some(ahead as u32),
+		behind: Some(behind as u32),
 		conflicted,
 		branch_name,
 	})

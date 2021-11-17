@@ -1,6 +1,6 @@
 [package]
 name = "powerline"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["growse <github@growse.com>", "cirho <me@cirho.com>"]
 edition = "2021"
 
@@ -17,7 +17,7 @@ dirs = "4.0.0"
 criterion = "0.3"
 
 [features]
-default = ["bash-shell", "libgit", "cli-options", "time"]
+default = ["bash-shell", "cli-options", "time"]
 bash-shell = []
 bare-shell = []
 zsh-shell = []
