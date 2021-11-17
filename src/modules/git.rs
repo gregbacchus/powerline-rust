@@ -106,12 +106,12 @@ impl<S: GitScheme> Module for Git<S> {
 					_ => segments.push(Segment::simple(format!(" {}{} ", count, symbol), fg, bg)),
 				};
 
-				if let Some(ahead) = git_stats.ahead {
-					add_elem(ahead, '\u{2B06}', S::GIT_AHEAD_FG, S::GIT_AHEAD_BG)
-				}
-				if let Some(behind) = git_stats.behind {
-					add_elem(behind, '\u{2B07}', S::GIT_BEHIND_FG, S::GIT_BEHIND_BG);
-				}
+				// if let Some(ahead) = git_stats.ahead {
+				//	add_elem(ahead, '\u{2B06}', S::GIT_AHEAD_FG, S::GIT_AHEAD_BG)
+				//}
+				// if let Some(behind) = git_stats.behind {
+				//	add_elem(behind, '\u{2B07}', S::GIT_BEHIND_FG, S::GIT_BEHIND_BG);
+				//}
 
 				add_elem(git_stats.staged, '\u{2714}', S::GIT_STAGED_FG, S::GIT_STAGED_BG);
 				add_elem(git_stats.non_staged, '\u{270E}', S::GIT_NOTSTAGED_FG, S::GIT_NOTSTAGED_BG);
