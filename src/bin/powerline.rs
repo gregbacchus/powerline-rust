@@ -62,14 +62,14 @@ fn main() {
 				CWD_DISABLED_FLAG => cwd_enabled = false,
 				PYVENV_ENABLED_FLAG => pyvenv_enabled = true,
 				PYVENV_DISABLED_FLAG => pyvenv_enabled = false,
-				_ => {}
+				_ => {},
 			}
 			#[cfg(feature = "time")]
 			{
 				match arg.as_str() {
 					TIME_ENABLED_FLAG => time_enabled = true,
 					TIME_DISABLED_FLAG => time_enabled = false,
-					_ => {}
+					_ => {},
 				}
 			}
 		}
