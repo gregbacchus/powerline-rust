@@ -21,28 +21,25 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
     steps:
-      - name: Install kcov
-        run: sudo apt-get update && sudo apt-get install cmake g++ pkg-config jq  libcurl4-openssl-dev libelf-dev libdw-dev binutils-dev libiberty-dev -y
       - uses: actions/checkout@v2
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - name: Install kcov cargo
-        run: cargo install cargo-kcov
-      - name: Install kcov
-        run: cargo kcov --print-install-kcov-sh | sh
-      - name: Build
-        run: cargo build --release --all-features
-      - name: Test
-        run: cargo kcov
-      - uses: codecov/codecov-action@v1
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v1
+      - name: Install cargo tarpaulin
+        run: cargo install cargo-tarpaulin
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --all-features
+      - uses: actions-rs/cargo@v1
+        with:
+          command: tarpaulin
+          args: --out Xml
+      - uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
         if: always()
   make_multiarch:
     strategy:
@@ -94,20 +91,35 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: target
-      - name: Set up Ruby 2.5
-        uses: actions/setup-ruby@v1
+      - name: Set up Ruby 3.0
+        uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.5
-      - name: Install gems
-        run: |
-          gem install fpm -v 1.11.0
+          ruby-version: 3.0
+          bundler-cache: true
+          working-directory: ./packaging
       - name: Make deb package
+        working-directory: ./packaging
         run: |
-          export DEB_VERSION="$(cat Cargo.toml | grep "^version = " | awk  '{gsub(/"/, "", $3); print $3}')-$(printf "%04d" $GITHUB_RUN_NUMBER)"
-          echo $DEB_VERSION
+          export DEB_VERSION="$(cat ../Cargo.toml | grep "^version = " | awk  '{gsub(/"/, "", $3); print $3}')-$(printf "%04d" $GITHUB_RUN_NUMBER)"          
           find . -type f \( -name "powerline" -o -name "powerline-bare" \) -exec chmod +x {} \;
-          fpm -f -s dir -t deb --deb-priority optional --maintainer github@growse.com --vendor github@growse.com --license MIT -n $DEB_NAME --description "$APPDESCRIPTION" --url $APPURL --prefix / -a amd64 -v $DEB_VERSION ./x86_64-unknown-linux-musl/release/powerline=/usr/bin/powerline-rust ./x86_64-unknown-linux-musl/release/powerline-bare=/usr/bin/powerline-rust-bare
-          fpm -f -s dir -t deb --deb-priority optional --maintainer github@growse.com --vendor github@growse.com --license MIT -n $DEB_NAME --description "$APPDESCRIPTION" --url $APPURL --prefix / -a armhf -v $DEB_VERSION ./arm-unknown-linux-musleabihf/release/powerline=/usr/bin/powerline-rust ./arm-unknown-linux-musleabihf/release/powerline-bare=/usr/bin/powerline-rust-bare
+          for build in amd64,x86_64-unknown-linux-musl armhf,arm-unknown-linux-musleabihf; do
+            IFS=',' read arch target <<< "${build}";
+            bundle exec fpm -f \
+            -s dir \
+            -t deb \
+            --deb-priority optional \
+            --maintainer github@growse.com \
+            --vendor github@growse.com \
+            --license MIT \
+            -n $DEB_NAME \
+            --description "$APPDESCRIPTION" \
+            --url $APPURL \
+            --prefix / \
+            -a ${arch} \
+            -v $DEB_VERSION \
+            ../${target}/release/powerline=/usr/bin/powerline-rust \
+            ../${target}/release/powerline-bare=/usr/bin/powerline-rust-bare
+          done
         env:
           DEB_NAME: powerline-rust
           APPDESCRIPTION: powerline-shell written in Rust
@@ -116,8 +128,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: debfiles
-          path: "*.deb"
+          path: "packaging/*.deb"
       - name: Upload to Apt repo
+        working-directory: ./packaging
         env:
           APT_KEY_PASSPHRASE: ${{ secrets.APT_KEY_PASSPHRASE }}
           APT_CREDENTIALS: ${{ secrets.APT_CREDENTIALS }}
