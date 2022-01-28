@@ -101,7 +101,7 @@ jobs:
         working-directory: ./packaging
         run: |
           export DEB_VERSION="$(cat ../Cargo.toml | grep "^version = " | awk  '{gsub(/"/, "", $3); print $3}')-$(printf "%04d" $GITHUB_RUN_NUMBER)"          
-          find . -type f \( -name "powerline" -o -name "powerline-bare" \) -exec chmod +x {} \;
+          find .. -type f \( -name "powerline" -o -name "powerline-bare" \) -exec chmod +x {} \;
           for build in amd64,x86_64-unknown-linux-musl armhf,arm-unknown-linux-musleabihf; do
             IFS=',' read arch target <<< "${build}";
             bundle exec fpm -f \
