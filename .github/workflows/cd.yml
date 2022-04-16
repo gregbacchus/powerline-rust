@@ -11,10 +11,10 @@ on:
       - .github/workflows/pull_requests.yml
       - .gitigore
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build_and_test:
