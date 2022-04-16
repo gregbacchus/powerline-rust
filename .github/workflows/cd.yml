@@ -81,9 +81,8 @@ jobs:
         with:
           name: target
           path: target/**/release/powerline*
-  package:
+  build-package:
     name: Build deb packages
-    if: github.event_name != 'pull_request'
     needs: make_multiarch
     runs-on: ubuntu-latest
     steps:
@@ -91,10 +90,9 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: target
-      - name: Set up Ruby 3.0
+      - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.0
           bundler-cache: true
           working-directory: ./packaging
       - name: Make deb package
@@ -127,13 +125,23 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: debfiles
+          name: deb-packages
           path: "packaging/*.deb"
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    needs: build-package
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: deb-packages
       - name: Upload to Apt repo
-        working-directory: ./packaging
         env:
-          APT_KEY_PASSPHRASE: ${{ secrets.APT_KEY_PASSPHRASE }}
           APT_CREDENTIALS: ${{ secrets.APT_CREDENTIALS }}
+          APT_KEY_PASSPHRASE: ${{ secrets.APT_KEY_PASSPHRASE }}
+
         run: |
           echo $APT_CREDENTIALS > aptly-auth
           find -maxdepth 1 -name "*.deb" -exec curl -f --netrc-file aptly-auth -XPOST -F file=@{} https://apttoo.growse.com/api/files/powerline \;
