@@ -11,17 +11,17 @@ on:
       - .github/workflows/pull_requests.yml
       - .gitigore
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build_and_test:
     name: Build and Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -37,7 +37,7 @@ jobs:
         with:
           command: tarpaulin
           args: --out Xml
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: true
         if: always()
@@ -52,8 +52,8 @@ jobs:
     needs: build_and_test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cargo/registry
@@ -77,24 +77,22 @@ jobs:
           use-cross: true
           args: --release --target=${{ matrix.target }}
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: target
           path: target/**/release/powerline*
-  package:
+  build-package:
     name: Build deb packages
-    if: github.event_name != 'pull_request'
     needs: make_multiarch
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: target
-      - name: Set up Ruby 3.0
+      - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.0
           bundler-cache: true
           working-directory: ./packaging
       - name: Make deb package
@@ -125,15 +123,25 @@ jobs:
           APPDESCRIPTION: powerline-shell written in Rust
           APPURL: https://github.com/growse/powerline-rust
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: debfiles
+          name: deb-packages
           path: "packaging/*.deb"
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    needs: build-package
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: deb-packages
       - name: Upload to Apt repo
-        working-directory: ./packaging
         env:
-          APT_KEY_PASSPHRASE: ${{ secrets.APT_KEY_PASSPHRASE }}
           APT_CREDENTIALS: ${{ secrets.APT_CREDENTIALS }}
+          APT_KEY_PASSPHRASE: ${{ secrets.APT_KEY_PASSPHRASE }}
+
         run: |
           echo $APT_CREDENTIALS > aptly-auth
           find -maxdepth 1 -name "*.deb" -exec curl -f --netrc-file aptly-auth -XPOST -F file=@{} https://apttoo.growse.com/api/files/powerline \;
