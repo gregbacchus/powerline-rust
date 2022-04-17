@@ -18,4 +18,5 @@ jobs:
       - uses: boa-dev/criterion-compare-action@v3.2.0
         with:
           benchName: cli
+          branchName: main
           token: ${{ secrets.GITHUB_TOKEN }}
