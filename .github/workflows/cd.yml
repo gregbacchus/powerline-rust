@@ -77,7 +77,7 @@ jobs:
           use-cross: true
           args: --release --target=${{ matrix.target }}
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: target
           path: target/**/release/powerline*
@@ -123,7 +123,7 @@ jobs:
           APPDESCRIPTION: powerline-shell written in Rust
           APPURL: https://github.com/growse/powerline-rust
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: deb-packages
           path: "packaging/*.deb"
