@@ -5,7 +5,7 @@ authors = ["growse <github@growse.com>", "cirho <me@cirho.com>"]
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0.56"
+anyhow = "1.0.57"
 users = "0.11"
 libc = "0.2"
 hostname = "0.3"
