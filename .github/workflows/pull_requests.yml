@@ -15,7 +15,7 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-bench-${{ hashFiles('**/Cargo.lock') }}
-      - uses: boa-dev/criterion-compare-action@v3.2.1
+      - uses: boa-dev/criterion-compare-action@v3.2.2
         with:
           benchName: cli
           branchName: main
