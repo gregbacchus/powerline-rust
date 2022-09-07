@@ -47,6 +47,7 @@ jobs:
         target:
           - x86_64-unknown-linux-musl
           - arm-unknown-linux-musleabihf
+          - aarch64-unknown-linux-musl
     name: Make multi-arch binaries
     if: github.event_name != 'pull_request'
     needs: build_and_test
@@ -98,9 +99,9 @@ jobs:
       - name: Make deb package
         working-directory: ./packaging
         run: |
-          export DEB_VERSION="$(cat ../Cargo.toml | grep "^version = " | awk  '{gsub(/"/, "", $3); print $3}')-$(printf "%04d" $GITHUB_RUN_NUMBER)"          
+          export DEB_VERSION="$(cat ../Cargo.toml | grep "^version = " | awk  '{gsub(/"/, "", $3); print $3}')-$(printf "%04d" $GITHUB_RUN_NUMBER)"
           find .. -type f \( -name "powerline" -o -name "powerline-bare" \) -exec chmod +x {} \;
-          for build in amd64,x86_64-unknown-linux-musl armhf,arm-unknown-linux-musleabihf; do
+          for build in amd64,x86_64-unknown-linux-musl armhf,arm-unknown-linux-musleabihf aarch64,aarch64-unknown-linux-musl; do
             IFS=',' read arch target <<< "${build}";
             bundle exec fpm -f \
             -s dir \
@@ -150,4 +151,3 @@ jobs:
           export failed=$(echo $result | jq '.FailedFiles | length')
           if [[ "$failed" != "0" ]]; then exit 1; fi
           curl -f --netrc-file aptly-auth -X PUT -H"Content-type: application/json" --data '{"Signing":{"Passphrase":"'"$APT_KEY_PASSPHRASE"'","Batch":true}}' https://apttoo.growse.com/api/publish/:./stablish
-
