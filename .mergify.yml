@@ -3,7 +3,7 @@ queue_rules:
     conditions:
       # Conditions to get out of the queue (= merged)
       - "check-success=Build and Test"
-      
+
 pull_request_rules:
   - name: Automatic merge on approval
     conditions:
@@ -12,4 +12,3 @@ pull_request_rules:
       queue:
         name: default
         method: rebase
-
