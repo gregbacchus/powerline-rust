@@ -1,15 +1,21 @@
-name: Build and Test
+---
+env:
+  PACKAGE_NAME: powerline-rust
+  PACKAGE_DESCRIPTION: powerline-shell written in Rust
+  PACKAGE_ARCH: amd64
+  RUST_TARGET: x86_64-unknown-linux-musl
+  CARGO_USE_CROSS: true
+  BINARY_NAME: modem-keepaliver
 
-on:
+name: Build, package and upload
+"on":
   push:
     paths-ignore:
       - "*.md"
       - LICENSE
       - rustfmt.toml
-      - examples/**
-      - .github/dependabot.yml
-      - .github/workflows/pull_requests.yml
-      - .gitigore
+      - .github/renovate.json
+      - .gitignore
     branches:
       - main
   pull_request:
@@ -54,13 +60,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
       - name: Build bare version
         uses: actions-rs/cargo@v1
         with:
@@ -111,25 +112,26 @@ jobs:
             --vendor github@growse.com \
             --license MIT \
             -n $DEB_NAME \
-            --description "$APPDESCRIPTION" \
-            --url $APPURL \
+            --description "$APP_DESCRIPTION" \
+            --url $APP_URL \
             --prefix / \
-            -a ${arch} \
+            -a $DEB_ARCH \
             -v $DEB_VERSION \
             ../${target}/release/powerline=/usr/bin/powerline-rust \
             ../${target}/release/powerline-bare=/usr/bin/powerline-rust-bare
           done
         env:
-          DEB_NAME: powerline-rust
-          APPDESCRIPTION: powerline-shell written in Rust
-          APPURL: https://github.com/growse/powerline-rust
+          DEB_NAME: ${{ env.PACKAGE_NAME }}
+          APP_DESCRIPTION: ${{ env.PACKAGE_DESCRIPTION }}
+          APP_URL: https://github.com/${{ github.repository }}
+          DEB_ARCH: ${{ env.PACKAGE_ARCH }}
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: deb-packages
           path: "packaging/*.deb"
-  deploy:
-    name: Deploy
+  publish:
+    name: Publish
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request'
     needs: build-package
@@ -142,7 +144,6 @@ jobs:
         env:
           APT_CREDENTIALS: ${{ secrets.APT_CREDENTIALS }}
           APT_KEY_PASSPHRASE: ${{ secrets.APT_KEY_PASSPHRASE }}
-
         run: |
           echo $APT_CREDENTIALS > aptly-auth
           find -maxdepth 1 -name "*.deb" -exec curl -f --netrc-file aptly-auth -XPOST -F file=@{} https://apttoo.growse.com/api/files/powerline \;
