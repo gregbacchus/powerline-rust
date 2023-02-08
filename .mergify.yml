@@ -7,7 +7,7 @@ queue_rules:
 pull_request_rules:
   - name: Automatic merge on approval
     conditions:
-      - "check-success=Build and Test"
+      - "check-success=Build deb packages"
     actions:
       queue:
         name: default

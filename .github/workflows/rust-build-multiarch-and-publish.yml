@@ -55,7 +55,6 @@ jobs:
           - arm-unknown-linux-musleabihf
           - aarch64-unknown-linux-musl
     name: Make multi-arch binaries
-    if: github.event_name != 'pull_request'
     needs: build_and_test
     runs-on: ubuntu-latest
     steps:
