@@ -20,7 +20,7 @@ pub trait CwdScheme {
 	const HOME_FG: Color;
 	const HOME_BG: Color;
 	const SEPARATOR_FG: Color;
-	const CWD_HOME_SYMBOL: &'static str = "~";
+	const CWD_HOME_SYMBOL: &'static str = "";
 }
 
 impl<S: CwdScheme> Cwd<S> {
@@ -57,7 +57,7 @@ impl<S: CwdScheme> Module for Cwd<S> {
 			let home_str = home_path.to_str().unwrap();
 
 			if cwd.starts_with(home_str) {
-				segments.push(Segment::simple(format!(" {} ", S::CWD_HOME_SYMBOL), S::HOME_FG, S::HOME_BG));
+				segments.push(Segment::simple(format!(" {}  ", S::CWD_HOME_SYMBOL), S::HOME_FG, S::HOME_BG));
 				cwd = &cwd[home_str.len()..]
 			}
 		}

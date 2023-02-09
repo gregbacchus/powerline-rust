@@ -99,11 +99,11 @@ impl<S: GitScheme> Module for Git<S> {
 					(S::GIT_REPO_CLEAN_FG, S::GIT_REPO_CLEAN_BG)
 				};
 
-				segments.push(Segment::simple(format!(" {} ", git_stats.branch_name), branch_fg, branch_bg));
+				segments.push(Segment::simple(format!("  {} ", git_stats.branch_name), branch_fg, branch_bg));
 
 				let mut add_elem = |count, symbol, fg, bg| match count {
 					1 => segments.push(Segment::simple(format!(" {} ", symbol), fg, bg)),
-					_ => segments.push(Segment::simple(format!(" {}{} ", count, symbol), fg, bg)),
+					_ => segments.push(Segment::simple(format!(" {} {} ", symbol, count), fg, bg)),
 				};
 
 				// if let Some(ahead) = git_stats.ahead {

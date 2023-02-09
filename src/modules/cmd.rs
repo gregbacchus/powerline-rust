@@ -37,6 +37,6 @@ impl<S: CmdScheme> Module for Cmd<S> {
 
 		let is_root = users::get_current_uid() == 0;
 		let special = if is_root { S::CMD_ROOT_SYMBOL } else { S::CMD_USER_SYMBOL };
-		segments.push(Segment::simple(format!(" {} ", special), fg, bg));
+		segments.push(Segment::simple(format!("\n {} ", special), fg, bg));
 	}
 }

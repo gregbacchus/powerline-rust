@@ -8,6 +8,7 @@ mod host;
 mod pyvenv;
 mod readonly;
 mod user;
+mod fish;
 
 #[cfg(feature = "time")]
 mod time;
@@ -20,6 +21,7 @@ pub use host::{Host, HostScheme};
 pub use pyvenv::{PyVenv, PyVenvScheme};
 pub use readonly::{ReadOnly, ReadOnlyScheme};
 pub use user::{User, UserScheme};
+pub use fish::{Fish, FishScheme};
 
 #[cfg(feature = "time")]
 pub use time::{Time, TimeScheme};

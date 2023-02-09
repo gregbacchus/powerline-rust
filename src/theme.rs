@@ -7,8 +7,8 @@ use crate::modules::TimeScheme;
 pub struct SimpleTheme;
 
 impl CmdScheme for SimpleTheme {
+	const CMD_PASSED_BG: Color = Color(237);
 	const CMD_PASSED_FG: Color = Color(15);
-	const CMD_PASSED_BG: Color = Color(8);
 	const CMD_FAILED_BG: Color = Color(9);
 	const CMD_FAILED_FG: Color = Color(15);
 }
@@ -16,9 +16,9 @@ impl CmdScheme for SimpleTheme {
 impl CwdScheme for SimpleTheme {
 	const CWD_FG: Color = Color(255);
 	const PATH_FG: Color = Color(15);
-	const PATH_BG: Color = Color(12);
+	const PATH_BG: Color = Color(237);
 	const HOME_FG: Color = Color(15);
-	const HOME_BG: Color = Color(0);
+	const HOME_BG: Color = Color(75);
 	const SEPARATOR_FG: Color = Color(244);
 }
 
@@ -33,6 +33,11 @@ impl UserScheme for SimpleTheme {
 	const USERNAME_FG: Color = Color(255);
 }
 
+impl FishScheme for SimpleTheme {
+	const FISH_BG: Color = Color(220);
+	const FISH_FG: Color = Color(0);
+}
+
 impl HostScheme for SimpleTheme {
 	const HOSTNAME_FG: Color = Color(255);
 	const HOSTNAME_BG: Color = Color(8);
@@ -45,7 +50,7 @@ impl ReadOnlyScheme for SimpleTheme {
 
 #[cfg(feature = "time")]
 impl TimeScheme for SimpleTheme {
-	const TIME_BG: Color = Color(8);
+	const TIME_BG: Color = Color(0);
 	const TIME_FG: Color = Color(255);
 }
 
