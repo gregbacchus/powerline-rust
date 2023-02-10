@@ -53,7 +53,12 @@ precmd_functions+=(_update_ps1)
 You must also compile with `bare-shell` feature.
 ```bash
 function fish_prompt
+    set -fx CMD_PREV_EXEC_MS "$CMD_DURATION"
     powerline $status
+end
+function fish_prompt
+    set -fx CMD_PREV_EXEC_MS "$CMD_DURATION"
+    /Users/gregbacchus/.cargo/bin/minimalistic $status
 end
 ```
 
