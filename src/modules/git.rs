@@ -30,10 +30,8 @@ pub struct GitStats {
 }
 
 pub trait GitScheme {
-	const GIT_AHEAD_BG: Color;
-	const GIT_AHEAD_FG: Color;
-	const GIT_BEHIND_BG: Color;
-	const GIT_BEHIND_FG: Color;
+	const GIT_AHEAD_BEHIND_BG: Color;
+	const GIT_AHEAD_BEHIND_FG: Color;
 	const GIT_STAGED_BG: Color;
 	const GIT_STAGED_FG: Color;
 	const GIT_NOTSTAGED_BG: Color;
@@ -102,21 +100,26 @@ impl<S: GitScheme> Module for Git<S> {
 				segments.push(Segment::simple(format!("  {} ", git_stats.branch_name), branch_fg, branch_bg));
 
 				let mut add_elem = |count, symbol, fg, bg| match count {
-					1 => segments.push(Segment::simple(format!(" {} ", symbol), fg, bg)),
+					1 => segments.push(Segment::simple(format!(" {}  ", symbol), fg, bg)),
+					0 => (),
 					_ => segments.push(Segment::simple(format!(" {} {} ", symbol, count), fg, bg)),
 				};
 
-				// if let Some(ahead) = git_stats.ahead {
-				//	add_elem(ahead, '\u{2B06}', S::GIT_AHEAD_FG, S::GIT_AHEAD_BG)
-				//}
-				// if let Some(behind) = git_stats.behind {
-				//	add_elem(behind, '\u{2B07}', S::GIT_BEHIND_FG, S::GIT_BEHIND_BG);
-				//}
+				if let Some(ahead) = git_stats.ahead {
+					if ahead > 0 {
+						add_elem(ahead, '\u{F0AA}', S::GIT_AHEAD_BEHIND_FG, S::GIT_AHEAD_BEHIND_BG)
+					}
+				}
+				if let Some(behind) = git_stats.behind {
+					if behind > 0 {
+						add_elem(behind, '\u{F0AB}', S::GIT_AHEAD_BEHIND_FG, S::GIT_AHEAD_BEHIND_BG);
+					}
+				}
 
-				add_elem(git_stats.staged, '\u{2714}', S::GIT_STAGED_FG, S::GIT_STAGED_BG);
-				add_elem(git_stats.non_staged, '\u{270E}', S::GIT_NOTSTAGED_FG, S::GIT_NOTSTAGED_BG);
-				// add_elem(git_stats.untracked, '?', S::GIT_UNTRACKED_FG, S::GIT_UNTRACKED_BG);
-				// add_elem(git_stats.conflicted, '\u{273C}', S::GIT_CONFLICTED_FG, S::GIT_CONFLICTED_BG);
+				add_elem(git_stats.staged, '\u{F00C}', S::GIT_STAGED_FG, S::GIT_STAGED_BG);
+				add_elem(git_stats.non_staged, '\u{F040}', S::GIT_NOTSTAGED_FG, S::GIT_NOTSTAGED_BG);
+				add_elem(git_stats.untracked, '\u{F067}', S::GIT_UNTRACKED_FG, S::GIT_UNTRACKED_BG);
+				add_elem(git_stats.conflicted, '\u{273C}', S::GIT_CONFLICTED_FG, S::GIT_CONFLICTED_BG);
 			})
 			.map_err(|error| {
 				segments.push(Segment::simple(

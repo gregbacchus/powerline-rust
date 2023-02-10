@@ -55,22 +55,20 @@ impl TimeScheme for SimpleTheme {
 }
 
 impl GitScheme for SimpleTheme {
-	const GIT_AHEAD_BG: Color = Color(240);
-	const GIT_AHEAD_FG: Color = Color(15);
-	const GIT_BEHIND_BG: Color = Color(240);
-	const GIT_BEHIND_FG: Color = Color(15);
+	const GIT_AHEAD_BEHIND_BG: Color = Color(240);
+	const GIT_AHEAD_BEHIND_FG: Color = Color(15);
 	const GIT_STAGED_BG: Color = Color(12);
 	const GIT_STAGED_FG: Color = Color(15);
 	const GIT_NOTSTAGED_BG: Color = Color(5);
 	const GIT_NOTSTAGED_FG: Color = Color(15);
-	const GIT_UNTRACKED_BG: Color = Color(11);
+	const GIT_UNTRACKED_BG: Color = Color(209);
 	const GIT_UNTRACKED_FG: Color = Color(15);
-	const GIT_CONFLICTED_BG: Color = Color(9);
+	const GIT_CONFLICTED_BG: Color = Color(160);
 	const GIT_CONFLICTED_FG: Color = Color(15);
-	const GIT_REPO_CLEAN_BG: Color = Color(10);
+	const GIT_REPO_CLEAN_BG: Color = Color(190);
 	const GIT_REPO_CLEAN_FG: Color = Color(0);
-	const GIT_REPO_DIRTY_BG: Color = Color(9);
-	const GIT_REPO_DIRTY_FG: Color = Color(15);
+	const GIT_REPO_DIRTY_BG: Color = Color(161);
+	const GIT_REPO_DIRTY_FG: Color = Color(255);
 	const GIT_REPO_ERROR_BG: Color = Color(9);
 	const GIT_REPO_ERROR_FG: Color = Color(15);
 }
