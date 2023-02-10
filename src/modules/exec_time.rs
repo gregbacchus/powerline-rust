@@ -9,8 +9,10 @@ pub struct ExecTime<S: ExecTimeScheme> {
 }
 
 pub trait ExecTimeScheme {
-	const EXEC_TIME_BG: Color;
-	const EXEC_TIME_FG: Color;
+	const EXEC_TIME_OK_BG: Color;
+	const EXEC_TIME_OK_FG: Color;
+	const EXEC_TIME_ERR_BG: Color;
+	const EXEC_TIME_ERR_FG: Color;
 }
 
 impl<S: ExecTimeScheme> ExecTime<S> {
@@ -45,11 +47,17 @@ impl<S: ExecTimeScheme> Module for ExecTime<S> {
 	fn append_segments(&mut self, segments: &mut Vec<Segment>) {
 		let duration_string = env::var("CMD_PREV_EXEC_MS").unwrap_or("".to_string());
 		let duration = duration_string.parse::<i32>().unwrap_or_default();
+		let exit_code = env::args().nth(1).unwrap_or_else(|| "1".to_string());
 
-		if duration == 0 {
+		if duration == 0 && exit_code == "0" {
 			return;
 		}
 
-		segments.push(Segment::simple(format!(" {} ", hms(duration)), S::EXEC_TIME_FG, S::EXEC_TIME_BG));
+		let (fg, bg) = match exit_code.as_str() {
+			"0" => (S::EXEC_TIME_OK_FG, S::EXEC_TIME_OK_BG),
+			_ => (S::EXEC_TIME_ERR_FG, S::EXEC_TIME_ERR_BG),
+		};
+
+		segments.push(Segment::simple(format!(" {} ", hms(duration)), fg, bg));
 	}
 }

@@ -42,8 +42,10 @@ impl FishScheme for SimpleTheme {
 }
 
 impl ExecTimeScheme for SimpleTheme {
-	const EXEC_TIME_BG: Color = Color(52);
-	const EXEC_TIME_FG: Color = WHITE;
+	const EXEC_TIME_OK_BG: Color = Color(22);
+	const EXEC_TIME_OK_FG: Color = WHITE;
+	const EXEC_TIME_ERR_BG: Color = Color(52);
+	const EXEC_TIME_ERR_FG: Color = WHITE;
 }
 
 impl HostScheme for SimpleTheme {
