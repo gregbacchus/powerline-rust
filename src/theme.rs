@@ -10,10 +10,8 @@ const WHITE: Color = Color(231);
 const BLACK: Color = Color(16);
 
 impl CmdScheme for SimpleTheme {
-	const CMD_PASSED_BG: Color = Color(237);
-	const CMD_PASSED_FG: Color = WHITE;
-	const CMD_FAILED_BG: Color = Color(9);
-	const CMD_FAILED_FG: Color = WHITE;
+	const CMD_BG: Color = Color(237);
+	const CMD_FG: Color = WHITE;
 }
 
 impl CwdScheme for SimpleTheme {
