@@ -46,6 +46,8 @@ impl ExecTimeScheme for SimpleTheme {
 	const EXEC_TIME_ERR_FG: Color = WHITE;
 }
 
+impl NewLineScheme for SimpleTheme {}
+
 impl HostScheme for SimpleTheme {
 	const HOSTNAME_FG: Color = Color(255);
 	const HOSTNAME_BG: Color = Color(8);
