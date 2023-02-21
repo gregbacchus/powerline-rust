@@ -75,6 +75,7 @@ impl<S: CwdScheme> Module for Cwd<S> {
 			let end = cwd.split('/').skip(depth - right + 1);
 
 			append_cwd_segments!(segments, start);
+			// " ... >"
 			segments.push(Segment::Text(TextSegment::special(
 				" \u{2026} ",
 				S::PATH_FG,
