@@ -96,8 +96,6 @@ impl<S: GitScheme> Module for Git<S> {
 			.map(|git_stats| {
 				let (branch_fg, branch_bg) = if git_stats.is_dirty() {
 					(S::GIT_REPO_DIRTY_FG, S::GIT_REPO_DIRTY_BG)
-				} else if git_stats.branch_upstream.is_empty() {
-					(S::GIT_REPO_NO_UPSTREAM_FG, S::GIT_REPO_NO_UPSTREAM_BG)
 				} else {
 					(S::GIT_REPO_CLEAN_FG, S::GIT_REPO_CLEAN_BG)
 				};
