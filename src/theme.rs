@@ -69,7 +69,7 @@ impl GitScheme for SimpleTheme {
 	const GIT_AHEAD_BEHIND_FG: Color = WHITE;
 	const GIT_CONFLICTED_BG: Color = Color(160);
 	const GIT_CONFLICTED_FG: Color = WHITE;
-	const GIT_NOT_STAGED_BG: Color = Color(57);
+	const GIT_NOT_STAGED_BG: Color = Color(63);
 	const GIT_NOT_STAGED_FG: Color = WHITE;
 	const GIT_REPO_CLEAN_BG: Color = Color(190);
 	const GIT_REPO_CLEAN_FG: Color = BLACK;
@@ -81,7 +81,7 @@ impl GitScheme for SimpleTheme {
 	const GIT_REPO_NO_UPSTREAM_FG: Color = BLACK;
 	const GIT_STAGED_BG: Color = Color(12);
 	const GIT_STAGED_FG: Color = WHITE;
-	const GIT_UNTRACKED_BG: Color = Color(57);
+	const GIT_UNTRACKED_BG: Color = Color(63);
 	const GIT_UNTRACKED_FG: Color = WHITE;
 }
 
