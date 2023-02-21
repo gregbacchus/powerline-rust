@@ -5,7 +5,7 @@ use libgit as internal;
 #[cfg(not(feature = "libgit"))]
 use process as internal;
 
-use crate::{terminal::Color, Segment, R};
+use crate::{terminal::Color, Segment, TextSegment, R};
 
 use super::Module;
 
@@ -100,16 +100,20 @@ impl<S: GitScheme> Module for Git<S> {
 					(S::GIT_REPO_CLEAN_FG, S::GIT_REPO_CLEAN_BG)
 				};
 
-				segments.push(Segment::simple(
+				segments.push(Segment::Text(TextSegment::simple(
 					format!(" 󰘬 {} ", git_stats.branch_name),
 					branch_fg,
 					branch_bg,
-				));
+				)));
 
 				let mut add_elem = |count, symbol, fg, bg| match count {
-					1 => segments.push(Segment::simple(format!(" {}  ", symbol), fg, bg)),
+					1 => segments.push(Segment::Text(TextSegment::simple(format!(" {}  ", symbol), fg, bg))),
 					0 => (),
-					_ => segments.push(Segment::simple(format!(" {} {} ", symbol, count), fg, bg)),
+					_ => segments.push(Segment::Text(TextSegment::simple(
+						format!(" {} {} ", symbol, count),
+						fg,
+						bg,
+					))),
 				};
 
 				if git_stats.branch_upstream.is_empty() {
@@ -132,11 +136,11 @@ impl<S: GitScheme> Module for Git<S> {
 				add_elem(git_stats.conflicted, '\u{273C}', S::GIT_CONFLICTED_FG, S::GIT_CONFLICTED_BG);
 			})
 			.map_err(|error| {
-				segments.push(Segment::simple(
+				segments.push(Segment::Text(TextSegment::simple(
 					format!("git error: {:?}", error),
 					S::GIT_REPO_ERROR_FG,
 					S::GIT_REPO_ERROR_BG,
-				))
+				)))
 			})
 			.unwrap_or_default();
 	}

@@ -1,8 +1,8 @@
-use std::marker::PhantomData;
 use std::env;
+use std::marker::PhantomData;
 
 use super::Module;
-use crate::{terminal::Color, Segment};
+use crate::{terminal::Color, Segment, TextSegment};
 
 pub struct Fish<S: FishScheme> {
 	scheme: PhantomData<S>,
@@ -23,10 +23,6 @@ impl<S: FishScheme> Module for Fish<S> {
 	fn append_segments(&mut self, segments: &mut Vec<Segment>) {
 		let title = env::var("TITLE").unwrap_or("".to_string());
 
-		segments.push(Segment::simple(
-			format!(" {} ", title),
-			S::FISH_FG,
-			S::FISH_BG,
-		));
+		segments.push(Segment::Text(TextSegment::simple(format!(" {} ", title), S::FISH_FG, S::FISH_BG)));
 	}
 }

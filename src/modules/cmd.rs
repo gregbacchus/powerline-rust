@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use super::Module;
-use crate::{powerline::Segment, terminal::Color};
+use crate::{powerline::Segment, powerline::TextSegment, terminal::Color};
 
 pub struct Cmd<S: CmdScheme> {
 	scheme: PhantomData<S>,
@@ -24,6 +24,6 @@ impl<S: CmdScheme> Module for Cmd<S> {
 	fn append_segments(&mut self, segments: &mut Vec<Segment>) {
 		let is_root = users::get_current_uid() == 0;
 		let special = if is_root { S::CMD_ROOT_SYMBOL } else { S::CMD_USER_SYMBOL };
-		segments.push(Segment::simple(format!(" {} ", special), S::CMD_FG, S::CMD_BG));
+		segments.push(Segment::Text(TextSegment::simple(format!(" {} ", special), S::CMD_FG, S::CMD_BG)));
 	}
 }

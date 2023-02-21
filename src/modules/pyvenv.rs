@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 use std::path::Path;
 
 use crate::terminal::Color;
-use crate::Segment;
+use crate::{Segment, TextSegment};
 
 use super::Module;
 
@@ -30,11 +30,11 @@ impl<S: PyVenvScheme> Module for PyVenv<S> {
 		pyvenv
 			.map(|venv| {
 				if let Some(venv_name) = Path::new(&venv).file_name() {
-					segments.push(Segment::simple(
+					segments.push(Segment::Text(TextSegment::simple(
 						format!(" {} {} ", S::PYVENV_SYMBOL, venv_name.to_string_lossy()),
 						S::PYVENV_FG,
 						S::PYVENV_BG,
-					));
+					)));
 				}
 			})
 			.unwrap_or_default();

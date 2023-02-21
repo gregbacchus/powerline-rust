@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use super::Module;
-use crate::{powerline::Segment, terminal::Color};
+use crate::powerline::Segment;
 
 pub struct NewLine<S: NewLineScheme> {
 	scheme: PhantomData<S>,
@@ -17,6 +17,6 @@ impl<S: NewLineScheme> NewLine<S> {
 
 impl<S: NewLineScheme> Module for NewLine<S> {
 	fn append_segments(&mut self, segments: &mut Vec<Segment>) {
-		segments.push(Segment::char_no_bg('\n', Color(0)));
+		segments.push(Segment::NewLine);
 	}
 }
