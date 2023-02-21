@@ -94,16 +94,16 @@ impl<S: GitScheme> Module for Git<S> {
 		let stats = self.get_git_data(git_dir);
 		stats
 			.map(|git_stats| {
-				let (branch_sym, branch_fg, branch_bg) = if git_stats.is_dirty() {
-					("󰘬".to_string(), S::GIT_REPO_DIRTY_FG, S::GIT_REPO_DIRTY_BG)
+				let (branch_fg, branch_bg) = if git_stats.is_dirty() {
+					(S::GIT_REPO_DIRTY_FG, S::GIT_REPO_DIRTY_BG)
 				} else if git_stats.branch_upstream.is_empty() {
-					("󰽤".to_string(), S::GIT_REPO_NO_UPSTREAM_FG, S::GIT_REPO_NO_UPSTREAM_BG)
+					(S::GIT_REPO_NO_UPSTREAM_FG, S::GIT_REPO_NO_UPSTREAM_BG)
 				} else {
-					("󰘬".to_string(), S::GIT_REPO_CLEAN_FG, S::GIT_REPO_CLEAN_BG)
+					(S::GIT_REPO_CLEAN_FG, S::GIT_REPO_CLEAN_BG)
 				};
 
 				segments.push(Segment::simple(
-					format!(" {} {} ", branch_sym, git_stats.branch_name),
+					format!(" 󰘬 {} ", git_stats.branch_name),
 					branch_fg,
 					branch_bg,
 				));
@@ -114,6 +114,9 @@ impl<S: GitScheme> Module for Git<S> {
 					_ => segments.push(Segment::simple(format!(" {} {} ", symbol, count), fg, bg)),
 				};
 
+				if git_stats.branch_upstream.is_empty() {
+					add_elem(1, '\u{EA97}', S::GIT_REPO_NO_UPSTREAM_FG, S::GIT_REPO_NO_UPSTREAM_BG)
+				}
 				if let Some(ahead) = git_stats.ahead {
 					if ahead > 0 {
 						add_elem(ahead, '\u{F0AA}', S::GIT_AHEAD_BEHIND_FG, S::GIT_AHEAD_BEHIND_BG)
