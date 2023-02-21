@@ -1,0 +1,19 @@
+{
+  "ignorePaths": [
+    "Cargo.lock"
+  ],
+  "words": [
+    "chrono",
+    "cirho",
+    "growse",
+    "libc",
+    "libgit",
+    "peekable",
+    "powerline",
+    "PYVENV",
+    "splitn",
+    "TYPECHANGE",
+    "venv",
+    "Workdir"
+  ]
+}
