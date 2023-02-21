@@ -73,6 +73,14 @@ pub fn run_git(path: &Path) -> R<super::GitStats> {
 			}
 		});
 
+	let branch_upstream = active_branch
+		.as_ref()
+		.map(|x| x.upstream().unwrap())
+		// .map(ToOwned::to_owned)
+		.map(|x| x.name().unwrap())
+		// .map(ToOwned::to_owned)
+		.unwrap_or_default();
+
 	Ok(GitStats {
 		untracked,
 		staged,
@@ -81,5 +89,6 @@ pub fn run_git(path: &Path) -> R<super::GitStats> {
 		behind: Some(behind as u32),
 		conflicted,
 		branch_name,
+		branch_upstream,
 	})
 }

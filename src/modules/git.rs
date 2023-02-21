@@ -27,25 +27,28 @@ pub struct GitStats {
 	pub behind: Option<u32>,
 	pub staged: u32,
 	pub branch_name: String,
+	pub branch_upstream: String,
 }
 
 pub trait GitScheme {
 	const GIT_AHEAD_BEHIND_BG: Color;
 	const GIT_AHEAD_BEHIND_FG: Color;
-	const GIT_STAGED_BG: Color;
-	const GIT_STAGED_FG: Color;
-	const GIT_NOTSTAGED_BG: Color;
-	const GIT_NOTSTAGED_FG: Color;
-	const GIT_UNTRACKED_BG: Color;
-	const GIT_UNTRACKED_FG: Color;
 	const GIT_CONFLICTED_BG: Color;
 	const GIT_CONFLICTED_FG: Color;
+	const GIT_NOT_STAGED_BG: Color;
+	const GIT_NOT_STAGED_FG: Color;
 	const GIT_REPO_CLEAN_BG: Color;
 	const GIT_REPO_CLEAN_FG: Color;
 	const GIT_REPO_DIRTY_BG: Color;
 	const GIT_REPO_DIRTY_FG: Color;
 	const GIT_REPO_ERROR_BG: Color;
 	const GIT_REPO_ERROR_FG: Color;
+	const GIT_REPO_NO_UPSTREAM_BG: Color;
+	const GIT_REPO_NO_UPSTREAM_FG: Color;
+	const GIT_STAGED_BG: Color;
+	const GIT_STAGED_FG: Color;
+	const GIT_UNTRACKED_BG: Color;
+	const GIT_UNTRACKED_FG: Color;
 }
 
 impl<S: GitScheme> Git<S> {
@@ -93,11 +96,17 @@ impl<S: GitScheme> Module for Git<S> {
 			.map(|git_stats| {
 				let (branch_fg, branch_bg) = if git_stats.is_dirty() {
 					(S::GIT_REPO_DIRTY_FG, S::GIT_REPO_DIRTY_BG)
+				} else if git_stats.branch_upstream.is_empty() {
+					(S::GIT_REPO_NO_UPSTREAM_FG, S::GIT_REPO_NO_UPSTREAM_BG)
 				} else {
 					(S::GIT_REPO_CLEAN_FG, S::GIT_REPO_CLEAN_BG)
 				};
 
-				segments.push(Segment::simple(format!("  {} ", git_stats.branch_name), branch_fg, branch_bg));
+				segments.push(Segment::simple(
+					format!("  {} ", git_stats.branch_name),
+					branch_fg,
+					branch_bg,
+				));
 
 				let mut add_elem = |count, symbol, fg, bg| match count {
 					1 => segments.push(Segment::simple(format!(" {}  ", symbol), fg, bg)),
@@ -117,7 +126,7 @@ impl<S: GitScheme> Module for Git<S> {
 				}
 
 				add_elem(git_stats.staged, '\u{F00C}', S::GIT_STAGED_FG, S::GIT_STAGED_BG);
-				add_elem(git_stats.non_staged, '\u{F040}', S::GIT_NOTSTAGED_FG, S::GIT_NOTSTAGED_BG);
+				add_elem(git_stats.non_staged, '\u{F040}', S::GIT_NOT_STAGED_FG, S::GIT_NOT_STAGED_BG);
 				add_elem(git_stats.untracked, '\u{F067}', S::GIT_UNTRACKED_FG, S::GIT_UNTRACKED_BG);
 				add_elem(git_stats.conflicted, '\u{273C}', S::GIT_CONFLICTED_FG, S::GIT_CONFLICTED_BG);
 			})

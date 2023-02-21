@@ -16,11 +16,15 @@ pub fn run_git(path: &Path) -> R<super::GitStats> {
 	let output = String::from_utf8_lossy(&git_status.stdout).to_string();
 	let output_split_by_line = output.split("\0").collect::<Vec<&str>>();
 	let mut branch_name: String = "".to_string();
+	let mut branch_upstream: String = "".to_string();
 	for header_line in output_split_by_line.iter().filter(|line| line.starts_with("# ")) {
 		let mut splits = header_line.splitn(3, " ");
 		match splits.nth(1) {
 			Some("branch.head") => {
 				branch_name = splits.last().unwrap_or("").to_string();
+			},
+			Some("branch.upstream") => {
+				branch_upstream = splits.last().unwrap_or("").to_string();
 			},
 			Some("branch.ab") => {
 				let header_value = splits.last().unwrap();
@@ -66,7 +70,7 @@ pub fn run_git(path: &Path) -> R<super::GitStats> {
 		}
 	}
 
-	Ok(GitStats { untracked, staged, non_staged, ahead, behind, conflicted, branch_name })
+	Ok(GitStats { untracked, staged, non_staged, ahead, behind, conflicted, branch_name, branch_upstream })
 }
 
 #[derive(Debug)]
