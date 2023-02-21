@@ -28,7 +28,7 @@ impl<S: HostScheme> Module for Host<S> {
 		if self.show_on_local || utils::is_remote_shell() {
 			if let Ok(host) = hostname::get() {
 				segments.push(Segment::simple(
-					format!(" {} ", host.to_str().unwrap()),
+					format!("{}", host.to_str().unwrap()),
 					S::HOSTNAME_FG,
 					S::HOSTNAME_BG,
 				));

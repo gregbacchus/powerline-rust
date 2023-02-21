@@ -33,7 +33,7 @@ macro_rules! append_cwd_segments {
 	($segments: ident, $iter: expr) => {
 		for val in $iter {
 			$segments.push(Segment::special(
-				format!(" {} ", val),
+				format!("{}", val),
 				S::PATH_FG,
 				S::PATH_BG,
 				'\u{E0B1}',
@@ -57,7 +57,7 @@ impl<S: CwdScheme> Module for Cwd<S> {
 			let home_str = home_path.to_str().unwrap();
 
 			if cwd.starts_with(home_str) {
-				segments.push(Segment::simple(format!(" {}  ", S::CWD_HOME_SYMBOL), S::HOME_FG, S::HOME_BG));
+				segments.push(Segment::simple(format!("{} ", S::CWD_HOME_SYMBOL), S::HOME_FG, S::HOME_BG));
 				cwd = &cwd[home_str.len()..]
 			}
 		}
@@ -72,13 +72,7 @@ impl<S: CwdScheme> Module for Cwd<S> {
 
 			append_cwd_segments!(segments, start);
 			// " ... >"
-			segments.push(Segment::special(
-				" \u{2026} ",
-				S::PATH_FG,
-				S::PATH_BG,
-				'\u{E0B1}',
-				S::SEPARATOR_FG,
-			));
+			segments.push(Segment::special("\u{2026}", S::PATH_FG, S::PATH_BG, '\u{E0B1}', S::SEPARATOR_FG));
 			append_cwd_segments!(segments, end);
 		} else {
 			append_cwd_segments!(segments, cwd.split('/').skip(1));

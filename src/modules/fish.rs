@@ -23,6 +23,6 @@ impl<S: FishScheme> Module for Fish<S> {
 	fn append_segments(&mut self, segments: &mut Vec<Segment>) {
 		let title = env::var("TITLE").unwrap_or("".to_string());
 
-		segments.push(Segment::simple(format!(" {} ", title), S::FISH_FG, S::FISH_BG));
+		segments.push(Segment::simple(format!("{}", title), S::FISH_FG, S::FISH_BG));
 	}
 }

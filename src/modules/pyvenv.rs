@@ -31,7 +31,7 @@ impl<S: PyVenvScheme> Module for PyVenv<S> {
 			.map(|venv| {
 				if let Some(venv_name) = Path::new(&venv).file_name() {
 					segments.push(Segment::simple(
-						format!(" {} {} ", S::PYVENV_SYMBOL, venv_name.to_string_lossy()),
+						format!("{} {}", S::PYVENV_SYMBOL, venv_name.to_string_lossy()),
 						S::PYVENV_FG,
 						S::PYVENV_BG,
 					));

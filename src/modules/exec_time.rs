@@ -58,6 +58,6 @@ impl<S: ExecTimeScheme> Module for ExecTime<S> {
 			_ => (S::EXEC_TIME_ERR_FG, S::EXEC_TIME_ERR_BG),
 		};
 
-		segments.push(Segment::simple(format!(" {} ", hms(duration)), fg, bg));
+		segments.push(Segment::simple(format!("{}", hms(duration)), fg, bg));
 	}
 }

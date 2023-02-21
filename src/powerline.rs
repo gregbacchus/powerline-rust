@@ -70,18 +70,18 @@ impl fmt::Display for Powerline {
 							Segment::NewLine => {
 								write!(
 									f,
-									"{}{}{}{}{}{}",
+									"{}{} {} {}{}{}",
 									text.fg, text.bg, text.val, Reset, text.sep_col, text.sep
 								)?;
 							},
 							Segment::Text(next_text) => {
 								if next_text.bg == text.bg && text.sep_col.transpose() == text.bg {
 									// skip separator
-									write!(f, "{}{}{}", text.fg, text.bg, text.val)?;
+									write!(f, "{}{} {}", text.fg, text.bg, text.val)?;
 								} else {
 									write!(
 										f,
-										"{}{}{}{}{}{}",
+										"{}{} {} {}{}{}",
 										text.fg, text.bg, text.val, next_text.bg, text.sep_col, text.sep
 									)?;
 								}
@@ -89,7 +89,11 @@ impl fmt::Display for Powerline {
 						}
 					} else {
 						// last segment - no more
-						write!(f, "{}{}{}{}{}{}", text.fg, text.bg, text.val, Reset, text.sep_col, text.sep)?;
+						write!(
+							f,
+							"{}{} {} {}{}{}",
+							text.fg, text.bg, text.val, Reset, text.sep_col, text.sep
+						)?;
 					}
 				},
 			}

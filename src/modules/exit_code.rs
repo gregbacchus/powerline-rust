@@ -24,7 +24,7 @@ impl<S: ExitCodeScheme> Module for ExitCode<S> {
 
 		if exit_code != "0" {
 			let (fg, bg) = (S::EXIT_CODE_FG, S::EXIT_CODE_BG);
-			segments.push(Segment::simple(format!(" EXIT {} ", exit_code), fg, bg));
+			segments.push(Segment::simple(format!("EXIT {}", exit_code), fg, bg));
 		}
 	}
 }

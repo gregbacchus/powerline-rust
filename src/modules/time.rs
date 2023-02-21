@@ -30,6 +30,6 @@ impl<S: TimeScheme> Module for Time<S> {
 		let now = chrono::offset::Local::now();
 		let value = now.format(self.time_format).to_string();
 
-		segments.push(Segment::simple(format!(" {} ", value), fg, bg));
+		segments.push(Segment::simple(format!("{}", value), fg, bg));
 	}
 }
