@@ -1,7 +1,7 @@
 use std::{env, marker::PhantomData};
 
 use super::Module;
-use crate::{powerline::Segment, terminal::Color, TextSegment};
+use crate::{powerline::Segment, terminal::Color};
 
 pub struct ExitCode<S: ExitCodeScheme> {
 	scheme: PhantomData<S>,
@@ -24,7 +24,7 @@ impl<S: ExitCodeScheme> Module for ExitCode<S> {
 
 		if exit_code != "0" {
 			let (fg, bg) = (S::EXIT_CODE_FG, S::EXIT_CODE_BG);
-			segments.push(Segment::Text(TextSegment::simple(format!(" EXIT {} ", exit_code), fg, bg)));
+			segments.push(Segment::simple(format!(" EXIT {} ", exit_code), fg, bg));
 		}
 	}
 }

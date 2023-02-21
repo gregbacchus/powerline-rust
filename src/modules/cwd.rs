@@ -2,7 +2,7 @@ use std::{env, marker::PhantomData, path};
 
 use dirs::home_dir;
 
-use crate::{terminal::Color, Segment, TextSegment};
+use crate::{terminal::Color, Segment};
 
 use super::Module;
 
@@ -32,13 +32,13 @@ impl<S: CwdScheme> Cwd<S> {
 macro_rules! append_cwd_segments {
 	($segments: ident, $iter: expr) => {
 		for val in $iter {
-			$segments.push(Segment::Text(TextSegment::special(
+			$segments.push(Segment::special(
 				format!(" {} ", val),
 				S::PATH_FG,
 				S::PATH_BG,
 				'\u{E0B1}',
 				S::SEPARATOR_FG,
-			)));
+			));
 		}
 	};
 }
@@ -57,11 +57,7 @@ impl<S: CwdScheme> Module for Cwd<S> {
 			let home_str = home_path.to_str().unwrap();
 
 			if cwd.starts_with(home_str) {
-				segments.push(Segment::Text(TextSegment::simple(
-					format!(" {}  ", S::CWD_HOME_SYMBOL),
-					S::HOME_FG,
-					S::HOME_BG,
-				)));
+				segments.push(Segment::simple(format!(" {}  ", S::CWD_HOME_SYMBOL), S::HOME_FG, S::HOME_BG));
 				cwd = &cwd[home_str.len()..]
 			}
 		}
@@ -76,13 +72,13 @@ impl<S: CwdScheme> Module for Cwd<S> {
 
 			append_cwd_segments!(segments, start);
 			// " ... >"
-			segments.push(Segment::Text(TextSegment::special(
+			segments.push(Segment::special(
 				" \u{2026} ",
 				S::PATH_FG,
 				S::PATH_BG,
 				'\u{E0B1}',
 				S::SEPARATOR_FG,
-			)));
+			));
 			append_cwd_segments!(segments, end);
 		} else {
 			append_cwd_segments!(segments, cwd.split('/').skip(1));

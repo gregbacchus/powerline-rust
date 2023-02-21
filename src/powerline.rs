@@ -16,19 +16,29 @@ pub enum Segment {
 	Text(TextSegment),
 }
 
-impl TextSegment {
-	pub fn simple<S: Into<String>>(val: S, fg: Color, bg: Color) -> TextSegment {
-		TextSegment {
+impl Segment {
+	pub fn new_line() -> Segment {
+		Segment::NewLine
+	}
+
+	pub fn simple<S: Into<String>>(val: S, fg: Color, bg: Color) -> Segment {
+		Segment::Text(TextSegment {
 			val: val.into(),
 			fg: fg.into_fg(),
 			bg: bg.into_bg(),
 			sep: '\u{E0B0}',
 			sep_col: bg.into_fg(),
-		}
+		})
 	}
 
-	pub fn special<S: Into<String>>(val: S, fg: Color, bg: Color, sep: char, sep_col: Color) -> TextSegment {
-		TextSegment { val: val.into(), fg: fg.into_fg(), bg: bg.into_bg(), sep, sep_col: sep_col.into_fg() }
+	pub fn special<S: Into<String>>(val: S, fg: Color, bg: Color, sep: char, sep_col: Color) -> Segment {
+		Segment::Text(TextSegment {
+			val: val.into(),
+			fg: fg.into_fg(),
+			bg: bg.into_bg(),
+			sep,
+			sep_col: sep_col.into_fg(),
+		})
 	}
 }
 

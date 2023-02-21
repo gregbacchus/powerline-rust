@@ -1,6 +1,6 @@
 use std::{ffi::CString, marker::PhantomData};
 
-use crate::{terminal::Color, Segment, TextSegment};
+use crate::{terminal::Color, Segment};
 
 use super::Module;
 
@@ -24,11 +24,11 @@ impl<S: ReadOnlyScheme> Module for ReadOnly<S> {
 			.unwrap_or(false);
 
 		if readonly {
-			segments.push(Segment::Text(TextSegment::simple(
+			segments.push(Segment::simple(
 				format!(" {} ", S::READONLY_SYMBOL),
 				S::READONLY_FG,
 				S::READONLY_BG,
-			)));
+			));
 		}
 	}
 }

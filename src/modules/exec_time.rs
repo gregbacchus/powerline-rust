@@ -2,7 +2,7 @@ use std::env;
 use std::marker::PhantomData;
 
 use super::Module;
-use crate::{terminal::Color, Segment, TextSegment};
+use crate::{terminal::Color, Segment};
 
 pub struct ExecTime<S: ExecTimeScheme> {
 	scheme: PhantomData<S>,
@@ -58,6 +58,6 @@ impl<S: ExecTimeScheme> Module for ExecTime<S> {
 			_ => (S::EXEC_TIME_ERR_FG, S::EXEC_TIME_ERR_BG),
 		};
 
-		segments.push(Segment::Text(TextSegment::simple(format!(" {} ", hms(duration)), fg, bg)));
+		segments.push(Segment::simple(format!(" {} ", hms(duration)), fg, bg));
 	}
 }

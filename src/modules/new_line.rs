@@ -17,6 +17,6 @@ impl<S: NewLineScheme> NewLine<S> {
 
 impl<S: NewLineScheme> Module for NewLine<S> {
 	fn append_segments(&mut self, segments: &mut Vec<Segment>) {
-		segments.push(Segment::NewLine);
+		segments.push(Segment::new_line());
 	}
 }
