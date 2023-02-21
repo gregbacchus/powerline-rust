@@ -103,7 +103,7 @@ impl<S: GitScheme> Module for Git<S> {
 				};
 
 				segments.push(Segment::simple(
-					format!("  {} ", git_stats.branch_name),
+					format!(" 󰘬 {} ", git_stats.branch_name),
 					branch_fg,
 					branch_bg,
 				));

@@ -75,11 +75,11 @@ pub fn run_git(path: &Path) -> R<super::GitStats> {
 
 	let branch_upstream = active_branch
 		.as_ref()
-		.map(|x| x.upstream().unwrap())
-		// .map(ToOwned::to_owned)
-		.map(|x| x.name().unwrap())
-		// .map(ToOwned::to_owned)
-		.unwrap_or_default();
+		.and_then(|x| x.upstream().ok())
+		.as_ref()
+		.and_then(|x| x.name().unwrap())
+		.unwrap_or_default()
+		.to_owned();
 
 	Ok(GitStats {
 		untracked,
