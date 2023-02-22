@@ -60,14 +60,14 @@ jobs:
       - uses: actions/checkout@v3
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
-      - name: Build bare version
+      - name: Build fish version
         uses: actions-rs/cargo@v1
         with:
           command: build
           use-cross: true
           args: --release --target=${{ matrix.target }} --no-default-features --features=fish-shell,libgit,cli-options,time
-      - name: rename bare binary
-        run: mv target/$TARGET/release/powerline target/$TARGET/powerline-fish
+      - name: rename fish binary
+        run: tar -czvf target/fish-$TARGET.tar.gz directory target/$TARGET/release/powerline
         env:
           TARGET: ${{ matrix.target }}
       - name: Build bash version
@@ -77,7 +77,7 @@ jobs:
           use-cross: true
           args: --release --target=${{ matrix.target }} --no-default-features --features=bash-shell,libgit,cli-options,time
       - name: rename bare binary
-        run: mv target/$TARGET/release/powerline target/$TARGET/powerline-bash
+        run: tar -czvf target/bash-$TARGET.tar.gz directory target/$TARGET/release/powerline
         env:
           TARGET: ${{ matrix.target }}
       - name: Build zsh version
@@ -86,15 +86,15 @@ jobs:
           command: build
           use-cross: true
           args: --release --target=${{ matrix.target }} --no-default-features --features=zsh-shell,libgit,cli-options,time
-      - name: rename bare binary
-        run: mv target/$TARGET/release/powerline target/$TARGET/powerline-zsh
+      - name: rename zsh binary
+        run: tar -czvf target/zsh-$TARGET.tar.gz directory target/$TARGET/release/powerline
         env:
           TARGET: ${{ matrix.target }}
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: target
-          path: target/*/powerline-*
+          path: target/*.tar.gz
   create-release:
     name: Create Github release
     needs: make_multiarch
@@ -116,8 +116,8 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            LICENSE.txt
-            built/*
+            LICENSE
+            built/*.tar.gz
   # build-package:
   #   name: Build deb packages
   #   needs: make_multiarch
