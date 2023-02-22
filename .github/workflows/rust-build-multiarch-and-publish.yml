@@ -67,7 +67,7 @@ jobs:
           use-cross: true
           args: --release --target=${{ matrix.target }} --no-default-features --features=fish-shell,libgit,cli-options,time
       - name: rename bare binary
-        run: mv target/$TARGET/release/powerline target/$TARGET/release/powerline-fish
+        run: mv target/$TARGET/release/powerline target/$TARGET/powerline-fish
         env:
           TARGET: ${{ matrix.target }}
       - name: Build bash version
@@ -77,7 +77,7 @@ jobs:
           use-cross: true
           args: --release --target=${{ matrix.target }} --no-default-features --features=bash-shell,libgit,cli-options,time
       - name: rename bare binary
-        run: mv target/$TARGET/release/powerline target/$TARGET/release/powerline-bash
+        run: mv target/$TARGET/release/powerline target/$TARGET/powerline-bash
         env:
           TARGET: ${{ matrix.target }}
       - name: Build zsh version
@@ -87,14 +87,14 @@ jobs:
           use-cross: true
           args: --release --target=${{ matrix.target }} --no-default-features --features=zsh-shell,libgit,cli-options,time
       - name: rename bare binary
-        run: mv target/$TARGET/release/powerline target/$TARGET/release/powerline-zsh
+        run: mv target/$TARGET/release/powerline target/$TARGET/powerline-zsh
         env:
           TARGET: ${{ matrix.target }}
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: target
-          path: target/**/release/powerline*
+          path: target/**/powerline-*
   create-release:
     name: Create Github release
     needs: make_multiarch
@@ -117,7 +117,7 @@ jobs:
           title: "Development Build"
           files: |
             LICENSE.txt
-            built/*/release/powerline-*
+            built/*
   # build-package:
   #   name: Build deb packages
   #   needs: make_multiarch
