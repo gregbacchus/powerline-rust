@@ -1,6 +1,6 @@
 [package]
 name = "powerline"
-version = "0.2.4"
+version = "1.0.0"
 authors = ["growse <github@growse.com>", "cirho <me@cirho.com>"]
 edition = "2021"
 
