@@ -94,7 +94,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: target
-          path: target/**/powerline-*
+          path: target/*/powerline-*
   create-release:
     name: Create Github release
     needs: make_multiarch
