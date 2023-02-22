@@ -66,8 +66,8 @@ jobs:
           command: build
           use-cross: true
           args: --release --target=${{ matrix.target }} --no-default-features --features=fish-shell,libgit,cli-options,time
-      - name: rename fish binary
-        run: tar -czvf target/fish-$TARGET.tar.gz target/$TARGET/release/powerline
+      - name: Compress fish binary
+        run: tar -czvf target/fish-$TARGET.tar.gz -C target/$TARGET/release powerline
         env:
           TARGET: ${{ matrix.target }}
       - name: Build bash version
@@ -76,8 +76,8 @@ jobs:
           command: build
           use-cross: true
           args: --release --target=${{ matrix.target }} --no-default-features --features=bash-shell,libgit,cli-options,time
-      - name: rename bare binary
-        run: tar -czvf target/bash-$TARGET.tar.gz target/$TARGET/release/powerline
+      - name: Compress bare binary
+        run: tar -czvf target/bash-$TARGET.tar.gz -C target/$TARGET/release powerline
         env:
           TARGET: ${{ matrix.target }}
       - name: Build zsh version
@@ -86,8 +86,8 @@ jobs:
           command: build
           use-cross: true
           args: --release --target=${{ matrix.target }} --no-default-features --features=zsh-shell,libgit,cli-options,time
-      - name: rename zsh binary
-        run: tar -czvf target/zsh-$TARGET.tar.gz target/$TARGET/release/powerline
+      - name: Compress zsh binary
+        run: tar -czvf target/zsh-$TARGET.tar.gz -C target/$TARGET/release powerline
         env:
           TARGET: ${{ matrix.target }}
       - name: Upload artifacts
