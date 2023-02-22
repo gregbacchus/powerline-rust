@@ -82,72 +82,72 @@ jobs:
         with:
           name: target
           path: target/**/release/powerline*
-  build-package:
-    name: Build deb packages
-    needs: make_multiarch
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
-        with:
-          name: target
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
-          working-directory: ./packaging
-      - name: Make deb package
-        working-directory: ./packaging
-        run: |
-          export DEB_VERSION="$(cat ../Cargo.toml | grep "^version = " | awk  '{gsub(/"/, "", $3); print $3}')-$(printf "%04d" $GITHUB_RUN_NUMBER)"
-          find .. -type f \( -name "powerline" -o -name "powerline-bare" \) -exec chmod +x {} \;
-          for build in amd64,x86_64-unknown-linux-musl armhf,arm-unknown-linux-musleabihf aarch64,aarch64-unknown-linux-musl; do
-            IFS=',' read arch target <<< "${build}";
-            bundle exec fpm -f \
-            -s dir \
-            -t deb \
-            --deb-priority optional \
-            --maintainer github@growse.com \
-            --vendor github@growse.com \
-            --license MIT \
-            -n $DEB_NAME \
-            --description "$APP_DESCRIPTION" \
-            --url $APP_URL \
-            --prefix / \
-            -a $DEB_ARCH \
-            -v $DEB_VERSION \
-            ../${target}/release/powerline=/usr/bin/powerline-rust \
-            ../${target}/release/powerline-bare=/usr/bin/powerline-rust-bare
-          done
-        env:
-          DEB_NAME: ${{ env.PACKAGE_NAME }}
-          APP_DESCRIPTION: ${{ env.PACKAGE_DESCRIPTION }}
-          APP_URL: https://github.com/${{ github.repository }}
-          DEB_ARCH: ${{ env.PACKAGE_ARCH }}
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: deb-packages
-          path: "packaging/*.deb"
-  publish:
-    name: Publish
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request'
-    needs: build-package
-    steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: deb-packages
-      - name: Upload to Apt repo
-        env:
-          APT_CREDENTIALS: ${{ secrets.APT_CREDENTIALS }}
-          APT_KEY_PASSPHRASE: ${{ secrets.APT_KEY_PASSPHRASE }}
-        run: |
-          echo $APT_CREDENTIALS > aptly-auth
-          find -maxdepth 1 -name "*.deb" -exec curl -f --netrc-file aptly-auth -XPOST -F file=@{} https://apttoo.growse.com/api/files/powerline \;
-          export result=$(curl -f --netrc-file aptly-auth -X POST https://apttoo.growse.com/api/repos/defaultrepo/file/powerline)
-          echo $result
-          export failed=$(echo $result | jq '.FailedFiles | length')
-          if [[ "$failed" != "0" ]]; then exit 1; fi
-          curl -f --netrc-file aptly-auth -X PUT -H"Content-type: application/json" --data '{"Signing":{"Passphrase":"'"$APT_KEY_PASSPHRASE"'","Batch":true}}' https://apttoo.growse.com/api/publish/:./stablish
+  # build-package:
+  #   name: Build deb packages
+  #   needs: make_multiarch
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: target
+  #     - name: Set up Ruby
+  #       uses: ruby/setup-ruby@v1
+  #       with:
+  #         bundler-cache: true
+  #         working-directory: ./packaging
+  #     - name: Make deb package
+  #       working-directory: ./packaging
+  #       run: |
+  #         export DEB_VERSION="$(cat ../Cargo.toml | grep "^version = " | awk  '{gsub(/"/, "", $3); print $3}')-$(printf "%04d" $GITHUB_RUN_NUMBER)"
+  #         find .. -type f \( -name "powerline" -o -name "powerline-bare" \) -exec chmod +x {} \;
+  #         for build in amd64,x86_64-unknown-linux-musl armhf,arm-unknown-linux-musleabihf aarch64,aarch64-unknown-linux-musl; do
+  #           IFS=',' read arch target <<< "${build}";
+  #           bundle exec fpm -f \
+  #           -s dir \
+  #           -t deb \
+  #           --deb-priority optional \
+  #           --maintainer github@growse.com \
+  #           --vendor github@growse.com \
+  #           --license MIT \
+  #           -n $DEB_NAME \
+  #           --description "$APP_DESCRIPTION" \
+  #           --url $APP_URL \
+  #           --prefix / \
+  #           -a $DEB_ARCH \
+  #           -v $DEB_VERSION \
+  #           ../${target}/release/powerline=/usr/bin/powerline-rust \
+  #           ../${target}/release/powerline-bare=/usr/bin/powerline-rust-bare
+  #         done
+  #       env:
+  #         DEB_NAME: ${{ env.PACKAGE_NAME }}
+  #         APP_DESCRIPTION: ${{ env.PACKAGE_DESCRIPTION }}
+  #         APP_URL: https://github.com/${{ github.repository }}
+  #         DEB_ARCH: ${{ env.PACKAGE_ARCH }}
+  #     - name: Upload artifacts
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: deb-packages
+  #         path: "packaging/*.deb"
+  # publish:
+  #   name: Publish
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name != 'pull_request'
+  #   needs: build-package
+  #   steps:
+  #     - name: Download build artifact
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: deb-packages
+  #     - name: Upload to Apt repo
+  #       env:
+  #         APT_CREDENTIALS: ${{ secrets.APT_CREDENTIALS }}
+  #         APT_KEY_PASSPHRASE: ${{ secrets.APT_KEY_PASSPHRASE }}
+  #       run: |
+  #         echo $APT_CREDENTIALS > aptly-auth
+  #         find -maxdepth 1 -name "*.deb" -exec curl -f --netrc-file aptly-auth -XPOST -F file=@{} https://apttoo.growse.com/api/files/powerline \;
+  #         export result=$(curl -f --netrc-file aptly-auth -X POST https://apttoo.growse.com/api/repos/defaultrepo/file/powerline)
+  #         echo $result
+  #         export failed=$(echo $result | jq '.FailedFiles | length')
+  #         if [[ "$failed" != "0" ]]; then exit 1; fi
+  #         curl -f --netrc-file aptly-auth -X PUT -H"Content-type: application/json" --data '{"Signing":{"Passphrase":"'"$APT_KEY_PASSPHRASE"'","Batch":true}}' https://apttoo.growse.com/api/publish/:./stablish
