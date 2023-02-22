@@ -79,8 +79,8 @@ impl GitScheme for SimpleTheme {
 	const GIT_REPO_ERROR_FG: Color = WHITE;
 	const GIT_REPO_NO_UPSTREAM_BG: Color = Color(240);
 	const GIT_REPO_NO_UPSTREAM_FG: Color = BLACK;
-	const GIT_STAGED_BG: Color = Color(12);
-	const GIT_STAGED_FG: Color = WHITE;
+	const GIT_STAGED_BG: Color = Color(142);
+	const GIT_STAGED_FG: Color = BLACK;
 	const GIT_UNTRACKED_BG: Color = Color(63);
 	const GIT_UNTRACKED_FG: Color = WHITE;
 }

@@ -17,21 +17,24 @@ With default settings `powerline-rust` uses `libgit` for git prompt. Unfortunate
 - optional caching git results in memory or file
 
 ## Simple installation
+
 ```bash
 git clone https://github.com/Xeoeen/powerline-rust
 cd powerline-rust
 # bash shell
-cargo install --path .
+cargo install --path . --features=bash-shell
 # zsh shell
-cargo install --path . --no-default-features --features=zsh-shell,libgit
+cargo install --path . --features=zsh-shell
 # fish shell
-cargo install --path . --no-default-features --features=bare-shell,libgit
+cargo install --path . --features=fish-shell
 ```
+
 You can also install one of examples by adding `--example {name}` to cargo command.
 
 ## Setting up shell
 #### Make sure you have executable in `$PATH`
 ### bash
+
 ```bash
 function _update_ps1() {
     PS1="$(powerline $?)"
@@ -41,16 +44,20 @@ if [ "$TERM" != "linux" ]; then
     PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
 fi
 ```
+
 ### zsh
 You must also compile with `zsh-shell` feature.
+
 ```zsh
 _update_ps1() {
     PS1="$(powerline $?)"
 }
 precmd_functions+=(_update_ps1)
 ```
+
 ### fish
-You must also compile with `bare-shell` feature.
+You must also compile with `fish-shell` feature.
+
 ```bash
 function fish_prompt
     set -fx CMD_PREV_EXEC_MS "$CMD_DURATION"
@@ -64,6 +71,7 @@ end
 
 ## Custom shell prompt
 Simply create new rust program that fulfils your requirements.
+
 ```rust
 use powerline::{modules::*, theme::SimpleTheme};
 
@@ -79,17 +87,18 @@ fn main() {
 
 	println!("{}", prompt);
 }
-
-
 ```
+
 ## Tips and trigs
 ### Strip executable
 Remove unnecessary symbols from file to greatly reduce size of it.
 Theoretically it can reduce time of execution.
+
 ```bash
 cd ~/.cargo/bin/
 strip powerline
 ```
+
 ### Use LTO and other
 
 ```toml
@@ -98,11 +107,14 @@ strip powerline
 lto = true
 panic = 'abort'
 ```
+
 ### Target native
 Enables optimizations for your specific processor.
+
 ```bash
 RUSTFLAGS="-C target-cpu=native" cargo ...
 ```
+
 ### Cache untracked files
 Git module can be slower on repos with big number of untracked files. Read about caching untracked files  [here](https://git-scm.com/docs/git-update-index).
 

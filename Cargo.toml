@@ -17,9 +17,10 @@ dirs = "4.0.0"
 criterion = "0.4"
 
 [features]
-default = ["bare-shell", "libgit", "time"]
+default = ["bare-shell", "cli-options", "libgit", "time"]
 bash-shell = []
 bare-shell = []
+fish-shell = ["bare-shell"]
 zsh-shell = []
 cli-options = []
 libgit = ["git2"]
