@@ -65,9 +65,9 @@ jobs:
         with:
           command: build
           use-cross: true
-          args: --release --target=${{ matrix.target }} --no-default-features --features=bare-shell,libgit,cli-options,time
+          args: --release --target=${{ matrix.target }} --no-default-features --features=fish-shell,libgit,cli-options,time
       - name: rename bare binary
-        run: mv target/$TARGET/release/powerline target/$TARGET/release/powerline-bare
+        run: mv target/$TARGET/release/powerline target/$TARGET/release/powerline-fish
         env:
           TARGET: ${{ matrix.target }}
       - name: Build bash version
@@ -76,6 +76,20 @@ jobs:
           command: build
           use-cross: true
           args: --release --target=${{ matrix.target }} --no-default-features --features=bash-shell,libgit,cli-options,time
+      - name: rename bare binary
+        run: mv target/$TARGET/release/powerline target/$TARGET/release/powerline-bash
+        env:
+          TARGET: ${{ matrix.target }}
+      - name: Build zsh version
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          use-cross: true
+          args: --release --target=${{ matrix.target }} --no-default-features --features=zsh-shell,libgit,cli-options,time
+      - name: rename bare binary
+        run: mv target/$TARGET/release/powerline target/$TARGET/release/powerline-zsh
+        env:
+          TARGET: ${{ matrix.target }}
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -90,10 +104,11 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: target
+          path: built
       - name: list
         run: |
           pwd ; \
-          find /home/runner/work/powerline-rust/powerline-rust ;
+          find /home/runner/work/powerline-rust/powerline-rust/built ;
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -102,7 +117,7 @@ jobs:
           title: "Development Build"
           files: |
             LICENSE.txt
-            *.jar
+            built/*/release/powerline-*
   # build-package:
   #   name: Build deb packages
   #   needs: make_multiarch
