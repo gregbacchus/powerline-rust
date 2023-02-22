@@ -17,10 +17,10 @@ name: Build, package and upload
       - .github/renovate.json
       - .gitignore
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   build_and_test:
