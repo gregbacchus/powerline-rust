@@ -134,7 +134,9 @@ jobs:
           path: target/*.tar.gz
   create-release:
     name: Create Github release
-    needs: make_multiarch
+    needs:
+      - make_multiarch
+      - make_macos
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
