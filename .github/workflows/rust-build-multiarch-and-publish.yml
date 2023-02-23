@@ -95,6 +95,43 @@ jobs:
         with:
           name: target
           path: target/*.tar.gz
+  make_macos:
+    name: Make MacOS binaries
+    needs: build_and_test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Build fish version
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          use-cross: true
+          args: --release --no-default-features --features=fish-shell,libgit,cli-options,time
+      - name: Compress fish binary
+        run: tar -czvf target/fish-macos.tar.gz -C target/x86_64-apple-darwin/release powerline
+      - name: Build bash version
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          use-cross: true
+          args: --release --no-default-features --features=bash-shell,libgit,cli-options,time
+      - name: Compress bare binary
+        run: tar -czvf target/bash-macos.tar.gz -C target/x86_64-apple-darwin/release powerline
+      - name: Build zsh version
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          use-cross: true
+          args: --release --no-default-features --features=zsh-shell,libgit,cli-options,time
+      - name: Compress zsh binary
+        run: tar -czvf target/zsh-macos.tar.gz -C target/x86_64-apple-darwin/release powerline
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: target
+          path: target/*.tar.gz
   create-release:
     name: Create Github release
     needs: make_multiarch
