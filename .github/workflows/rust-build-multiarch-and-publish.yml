@@ -110,7 +110,7 @@ jobs:
           use-cross: true
           args: --release --no-default-features --features=fish-shell,libgit,cli-options,time
       - name: Compress fish binary
-        run: ls target/; tar -czvf target/fish-macos.tar.gz -C target/x86_64-apple-darwin/release powerline
+        run: tar -czvf target/fish-macos.tar.gz -C target/release powerline
       - name: Build bash version
         uses: actions-rs/cargo@v1
         with:
@@ -118,7 +118,7 @@ jobs:
           use-cross: true
           args: --release --no-default-features --features=bash-shell,libgit,cli-options,time
       - name: Compress bare binary
-        run: tar -czvf target/bash-macos.tar.gz -C target/x86_64-apple-darwin/release powerline
+        run: tar -czvf target/bash-macos.tar.gz -C target/release powerline
       - name: Build zsh version
         uses: actions-rs/cargo@v1
         with:
@@ -126,7 +126,7 @@ jobs:
           use-cross: true
           args: --release --no-default-features --features=zsh-shell,libgit,cli-options,time
       - name: Compress zsh binary
-        run: tar -czvf target/zsh-macos.tar.gz -C target/x86_64-apple-darwin/release powerline
+        run: tar -czvf target/zsh-macos.tar.gz -C target/release powerline
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
