@@ -110,7 +110,7 @@ jobs:
           use-cross: true
           args: --release --no-default-features --features=fish-shell,libgit,cli-options,time
       - name: Compress fish binary
-        run: tar -czvf target/fish-macos.tar.gz -C target/x86_64-apple-darwin/release powerline
+        run: ls target/; tar -czvf target/fish-macos.tar.gz -C target/x86_64-apple-darwin/release powerline
       - name: Build bash version
         uses: actions-rs/cargo@v1
         with:
